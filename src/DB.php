@@ -17,16 +17,14 @@ function DB_json($sql){
 	}
 	//protected requests
 	if(isset($ini['user'])){
-		if (!isset($_SERVER['PHP_AUTH_USER'])) {
+		if (!isset($_SERVER['PHP_AUTH_USER'])
+		  ||!isset($ini['user'][$_SERVER['PHP_AUTH_USER']])
+			|| $ini['user'][$_SERVER['PHP_AUTH_USER']] != md5($_SERVER['PHP_AUTH_PW'])
+			){
 			header('WWW-Authenticate: Basic realm="My Realm"');
 			header('HTTP/1.0 401 Unauthorized');
-			throw new Exception("no credential on protected zone");
+			throw new Exception("No credential on protected zone");
 		}
-		$username = $_SERVER['PHP_AUTH_USER'];
-		if(!isset($ini['user'][$username]))
-			throw new Exception("no such user");
-		if($ini['user'][$username] != md5($_SERVER['PHP_AUTH_PW']))
-			throw new Exception("bad password");
 	}
 
 	$statement->execute();
