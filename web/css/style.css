@@ -4,3 +4,6 @@ body{
 .navbar{
 	background-image: url(/img/banner_bg.png);
 }
+label{
+	text-transform:capitalize;
+}

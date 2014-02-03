@@ -1,4 +1,5 @@
-﻿<?php
+<?php
+
 function DB_json($sql){
 //	return $sql;
 

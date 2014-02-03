@@ -26,7 +26,7 @@ class App{
 		$rep=$m($this->path,$this->loadParam(),$this->url);
 		
 		if($this->ajax && ($rep[0]=='{' || $rep[0]=='['))
-			header('Content-type: text/json');
+			header('Content-type: text/json');//; charset=utf-8
 		else
 			header('Content-type: text/html');
 		echo $rep;

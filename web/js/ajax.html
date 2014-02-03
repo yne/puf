@@ -1,8 +1,31 @@
 <html>
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="../css/style.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+
+function ressource_edit(val,type,table){
+	
+}
+function ressource_cell(val,type,table){
+	function btn(ico,oc){return '<button type="button" onclick="'+oc+'" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-'+ico+'"></span></button>';}
+	if(type=='id')
+		return val
+			+btn('trash'   ,"DB.remove('"+table+"','"+val+"')")
+			+btn('pencil'  ,"DB.form  ('"+table+"','#out','"+val+"')")
+			+btn('eye-open',"alert('"+val+"')");
+	if(type=='href')
+		return '<a href=#>'+val+'</a>';
+	if(['fichedev','bdd','photo'].indexOf(type)>=0)
+		return val*1?'&#10004;':'&#10008;';
+	return val;
+}
+</script>
 <body>
-<form id="out" onsubmit="submitForm(event,this);return false;"></form>
+<button onclick="DB.form('ressource','#out');">form</button>
+<button onclick="DB.list('ressource','#out',{cell:ressource_cell,table_class:'table-striped table-condensed'});">list</button>
+<div id="out"></div>
 </body>
 <script src="ajax.js"></script>
 </html>
+
