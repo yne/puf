@@ -1,23 +1,24 @@
-var DB={}
+var DB=function(type,table,opt){
+	(opt=opt||{}).type=type;
+	return $.ajax('/'+table,opt);
+}
 //utilities
 DB.space=function(title){
 	return title.replace(/_/g,' ')
 		.replace(/([A-Z])([A-Z])([a-z])|([a-z])([A-Z])/g,'$1$4 $2$3$5')//camel style spacing
 		.toLowerCase();
 }
-DB.cols2html=function(collumns){//TODO : process one row
-	return collumns.map(function(col){
-		var el=DB.Type[col.Type.match(/\w+/)[0].toUpperCase()];
-		el.maxlength=(col.Type.match(/\d+/)||[''])[0];
-		$.extend(el,{name:col.Field,id:el.name+Date.now(),title:col.Comment/*,value:0*/});
-		//if(col.Null=='NO' && el.type!='checkbox')el.required='required';//avoid forced checkbox
-		
-		var tag=(el.maxlength>255)||(el.type=='textarea')?'textarea':'input';
-		return '<div class="form-group" '+(col.Extra?'hidden':'')+'>'//extra => A_I => id => user hide
-			+'<label for="'+el.id+'">'+DB.space(col.Field)+'</label>'
-			+'<'+tag+' '
-			+$.map(el,function(v,n){return n+'="'+v+'"';}).join(' ')+' class="form-control"></'+tag+'></div>';
-	});
+DB.toInput=function(col){
+	var el=DB.Type[col.Type.match(/\w+/)[0].toUpperCase()];
+	el.maxlength=(col.Type.match(/\d+/)||[''])[0];
+	$.extend(el,{name:col.Field,id:el.name+Date.now(),title:col.Comment});
+	//if(col.Null=='NO' && el.type!='checkbox')el.required='required';//avoid forced checkbox
+	
+	var tag=(el.maxlength>255)||(el.type=='textarea')?'textarea':'input';
+	return '<div class="form-group" '+(col.Extra?'hidden':'')+'>'//extra => A_I => id => user hide
+		+'<label for="'+el.id+'">'+DB.space(col.Field)+'</label>'
+		+'<'+tag+' '
+		+$.map(el,function(v,n){return n+'="'+v+'"';}).join(' ')+' class="form-control"></'+tag+'></div>';
 };
 
 DB.Type={
@@ -38,36 +39,31 @@ DB.Type={
 };
 
 //Requests
-DB.list=function(table,target,opt){
-	opt=opt||{};
-	$.ajax('/'+table,{type:'get',cache:false}).success(function(json){
-		$(target).html(
-			'<table class="table '+(opt.table_class||'')+'">'
-			+'<tr>'+(json.length?Object.keys(json[0]).map(function(a){return '<th>'+DB.space(a)+'</th>'}).join(''):'<td>empty</td>')+'</tr>'
-			+json.map(function(row){
-				var html="";
-				for(var col in row)
-					html+='<td>'+(opt.cell?opt.cell(row[col],col,table):row[col])+'</td>';
-				return '<tr>'+html+'</tr>';
-			}).join('')
-			+'</table>');
-	});
-};
-DB.get=function(table,id){
-	return $.ajax('/'+table+'/'+id,{type:'get'});
-};
-DB.remove=function(table,id){
-	return $.ajax('/'+table+'/'+id,{type:'delete'}).always(function(json,status){alert(status)});
+DB.toList=function(json){
+	var args=this;
+	$(args.target).html(
+		'<table class="table '+(args.table_class||'')+'">'
+			+'<thead><tr>'+(json.length?Object.keys(json[0]).map(function(a){
+				return '<th>'+DB.space(a)+'</th>'}).join(''):'<td>empty</td>')+'</tr>'
+			+'</thead><tbody>'
+			+json.map(function(row){return "<tr>"+$.map(row,function(val,col){
+					return '<td>'+(args.cell?args.cell(args,val,col):row[col])+'</td>';
+				}).join('')+'</tr>';}).join('')
+		+'</tbody</table>');
 };
 
-DB.form=function(table,target,id){
-	$.ajax('/'+table,{type:'option'}).success(function(json){
-		$(target).html('<form data-type="'+table+'" onsubmit="DB.send(this);return false;">'
-			+DB.cols2html(json).join('')+'<input type="submit"/></form>');
-		if(id!=undefined)DB.get(table,id).success(function(json){
-			for(var attr in json[0])
-				$(target+" [name='"+attr+"']").val(json[0][attr]);
-		});
+DB.toForm=function(json){
+	var args=this;
+	$(args.target).html('<form data-type="'+args.table+'" onsubmit="DB.send(this);return false;">'
+		+json.map(DB.toInput).join('')
+		+'<div class="form-group">'
+		+'<input type="reset"  class="btn btn-default"/>'
+		+'<input type="submit" class="btn btn-primary pull-right"/>'
+		+'</div></form>');
+	//if id provided : load it values into the form
+	if(args.id!=undefined)DB('get',args.table+'/'+args.id).success(function(json){
+		for(var attr in json[0])
+			$(args.target+" [name='"+attr+"']").val(json[0][attr]);
 	});
 };
 
