@@ -30,9 +30,12 @@ function deleteDefault($p,$param,$url){
 	if(count($p)==2)return DB_json("DELETE FROM $p[0] WHERE id = $p[1]");
 	if(count($p)==3)return DB_json("DELETE FROM $p[0] WHERE $p[1] = '$p[2]'");
 }
-//HEAD
+//SEARCH
 function searchDefault($p,$param,$url){
-	return '{"cool":"yes"}';
+	return var_dump($param);
 }
 
 //POST
+function postDefault($p,$param,$url){
+	return '{"'.$p[0].'":"yes"}';
+}

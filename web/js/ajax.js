@@ -42,24 +42,34 @@ DB.Type={
 DB.toList=function(json){
 	var args=this;
 	$(args.target).html(
-		'<table class="table '+(args.table_class||'')+'">'
-			+'<thead><tr>'+(json.length?Object.keys(json[0]).map(function(a){
-				return '<th>'+DB.space(a)+'</th>'}).join(''):'<td>empty</td>')+'</tr>'
-			+'</thead><tbody>'
-			+json.map(function(row){return "<tr>"+$.map(row,function(val,col){
-					return '<td>'+(args.cell?args.cell(args,val,col):row[col])+'</td>';
-				}).join('')+'</tr>';}).join('')
-		+'</tbody</table>');
+		$('<table class="table">').addClass(args.table_class)
+			.append($('<thead>').append($('<tr>').append(json.length==0?'<td>empty</td>':
+				Object.keys(json[0]).map(function(a){return $('<th>'+DB.space(a)+'</th>')}))))
+			.append($('<tbody>').append(
+				json.map(function(row){return $("<tr>").append($.map(row,function(val,col){
+					return $('<td>').append(args.cell?args.cell(args,val,col):row[col]);
+				}))})
+			))
+	)
 };
 
 DB.toForm=function(json){
 	var args=this;
-	$(args.target).html('<form data-type="'+args.table+'" onsubmit="DB.send(this);return false;">'
+	var $form=$('<form>'
 		+json.map(DB.toInput).join('')
 		+'<div class="form-group">'
 		+'<input type="reset"  class="btn btn-default"/>'
 		+'<input type="submit" class="btn btn-primary pull-right"/>'
 		+'</div></form>');
+	//args.submit
+	$form.on('submit',function(event){
+		var arg = {};
+		$.map($(this).serializeArray(),function(n){arg[n.name] = n.value;});
+		$.ajax('/'+args.table,{type:"put",data:JSON.stringify(arg)}).success(args.success);
+		event.preventDefault();
+		return 0;
+	});
+	$(args.target).html($form);
 	//if id provided : load it values into the form
 	if(args.id!=undefined)DB('get',args.table+'/'+args.id).success(function(json){
 		for(var attr in json[0])
@@ -67,9 +77,20 @@ DB.toForm=function(json){
 	});
 };
 
-DB.send=function(form){
-	var arg = {};
-	$.map($(form).serializeArray(),function(n){arg[n.name] = n.value;});
-	$.ajax('/'+form.dataset.type,{type:"put",data:JSON.stringify(arg)})
-		.success(console.log).error(function(x,c,t){console.warn(t)});
+DB.toFind=function(json){
+	var args=this;
+	function obj2att(obj){return $.map(obj,function(a,b){return b+'="'+a+'"'}).join(' ')}
+	function obj2opt(obj){return $.map(obj,function(a,b){return '<option name="'+b+'">'+a+'</option>'}).join('')}
+	function formgrp(tag,attr,html){return '<div class="form-group"><'+tag+' '+attr+' class="form-control">'+html+'</'+tag+'></div>';}
+	var collumns={};
+	json.forEach(function(a){collumns[a.Field]=DB.space(a.Field);})
+	console.log(collumns)
+	
+	return $(args.target).html('<div class="row">'
+		+formgrp('select',obj2att({name:'j'  }),obj2opt({AND:"et",OR:"ou"}))
+		+formgrp('select',obj2att({name:'q'  }),obj2opt(collumns))
+		+formgrp('select',obj2att({name:'op' }),obj2opt({"~":"&#8776;","=":"=","!=":"&ne;","<":"&lt;",">":"&gt;",}))
+		+formgrp('input' ,obj2att({name:'val'}),'')
+		+formgrp('button',obj2att({name:'remove',type:"button",onclick:"$(this).closest('.row').remove();","class":"btn  btn-default"}),'<span class="glyphicon glyphicon-trash"></span>')
+	+'</row>');
 };

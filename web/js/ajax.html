@@ -4,28 +4,42 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
 
-function ressource_edit(val,type,table){
-	
+Alert=function(type,msg){ /* info,success,warning,danger */
+	$("#Alert").removeClass().addClass("alert fade in alert-"+type)
+		.html(msg).slideDown(400).delay(4000).slideUp(400);
 }
-function ressource_delete(val,type,table){
-	console.log(this,arguments);
-}
+
+$(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
+	Alert('danger',thrownError);
+	console.warn(this,arguments);
+})
+
+
 function ressource_cell(args,val,type){
-	function btn(ico,oc){return '<button type="button" onclick="'+oc+'" class="btn btn-default"><span class="glyphicon glyphicon-'+ico+'"></span></button>';}
+	function btn(ico,oc){return $('<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
 	if(type=='id')
-		return '<div class="btn-group" style="display:flex" title="'+val+'">'
-			+btn('trash'   ,"DB('delete','"+args.table+"/"+val+"').success(ressource_delete)")
-			+btn('pencil'  ,"DB('option','"+args.table+"',{context:{table:'"+args.table+"',target:'#Modal .modal-body',id:'"+val+"'}}).success(DB.toForm);$('#Modal').modal('show');")
-			+btn('eye-open',"alert('"+val+"')")
-			+"</div>";
+		return $('<div class="btn-group" style="display:flex" title="'+val+'">')
+			.append(btn('trash'   ,function(){
+				DB('delete',args.table+"/"+val).success((function(){
+					return $(this).closest('tr').fadeOut(500);
+				}).bind(this))
+			}))
+			.append(btn('pencil'  ,function(){
+				DB('option',args.table).success(
+					DB.toForm.bind({table:args.table,target:'#Modal .modal-body',id:val})
+				);
+				$('#Modal').modal('show');
+			}));
 	if(type=='href')
-		return '<a href="'+val+'">'+val+'</a>';
+		return $('<a href="'+val+'">').html('#'+val);
 	if(['fichedev','bdd','photo'].indexOf(type)>=0)
 		return val*1?'&#10004;':'&#10008;';
 	return val;
 }
 </script>
 <body>
+
+<div id="Alert"></div>
 
 <div class="modal fade" id="Modal">
 	<div class="modal-dialog modal-sm">
@@ -39,9 +53,51 @@ function ressource_cell(args,val,type){
 	</div>
 </div>
 
-<button onclick="DB('option','ressource',{context:{target:'#Modal .modal-body'}}).success(DB.toForm);$('#Modal').modal('show');">form</button>
-<button onclick="DB('get'   ,'ressource',{context:{target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}}).success(DB.toList);">list</button>
-<div id="out"></div>
+<style>
+#Alert{
+	bottom: 1em;
+	display: inline;
+	position: fixed;
+	right: 1em;
+	display: none;
+}
+.query{
+	list-style: none;
+	margin:0;
+}
+.query .row:first-child select[name=j]{
+	visibility: hidden;
+}
+.query .row:first-child [name=remove]{
+	display: none;
+}
+.query .row [name=val]{
+}
+.query .row [name=remove]{
+	visibility: hidden;
+}
+.query .row:hover [name=remove]{
+	visibility: visible;
+}
+</style>
+
+<div class="container">
+	<form class="form-inline">
+		<h3>Critere de recherche</h3>
+		<div class="query"></div>
+		<div id="addQuery" class="btn btn-link" onclick="$('.query .row:first').clone().appendTo('.query');">Ajouter un critère supplémentaire</div>
+	</form>
+	<div>
+		<button onclick="$('#Modal').modal('show');
+			DB('option','ressource').success(DB.toForm.bind({target:'#Modal .modal-body',table:'ressource',success:function(id){
+				$('#Modal').modal('hide');
+				Alert('success','Ressource:'+id);
+			}}));">add</button>
+		<button onclick="DB('get'   ,'ressource').success(DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));">listAll</button>
+		<button onclick="DB('option','ressource').success(DB.toFind.bind({target:'.query'}));">find</button>
+	</div>
+	<div id="out"></div>
+</div>
 </body>
 <script src="ajax.js"></script>
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
