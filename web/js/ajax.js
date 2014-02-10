@@ -80,17 +80,24 @@ DB.toForm=function(json){
 DB.toFind=function(json){
 	var args=this;
 	function obj2att(obj){return $.map(obj,function(a,b){return b+'="'+a+'"'}).join(' ')}
-	function obj2opt(obj){return $.map(obj,function(a,b){return '<option name="'+b+'">'+a+'</option>'}).join('')}
+	function obj2opt(obj){return $.map(obj,function(a,b){return '<option value="'+b+'">'+a+'</option>'}).join('')}
 	function formgrp(tag,attr,html){return '<div class="form-group"><'+tag+' '+attr+' class="form-control">'+html+'</'+tag+'></div>';}
 	var collumns={};
 	json.forEach(function(a){collumns[a.Field]=DB.space(a.Field);})
-	console.log(collumns)
 	
 	return $(args.target).html('<div class="row">'
-		+formgrp('select',obj2att({name:'j'  }),obj2opt({AND:"et",OR:"ou"}))
-		+formgrp('select',obj2att({name:'q'  }),obj2opt(collumns))
-		+formgrp('select',obj2att({name:'op' }),obj2opt({"~":"&#8776;","=":"=","!=":"&ne;","<":"&lt;",">":"&gt;",}))
-		+formgrp('input' ,obj2att({name:'val'}),'')
-		+formgrp('button',obj2att({name:'remove',type:"button",onclick:"$(this).closest('.row').remove();","class":"btn  btn-default"}),'<span class="glyphicon glyphicon-trash"></span>')
+		+formgrp('select','',obj2opt({AND:"et",OR:"ou"}))
+		+formgrp('select','',obj2opt(collumns))
+		+formgrp('select','',obj2opt({"LIKE":"&#8776;","=":"=","!=":"&ne;","<":"&lt;",">":"&gt;",}))
+		+formgrp('input' ,'','')
+		+formgrp('button',obj2att({type:"button",onclick:"$(this).closest('.row').remove();","class":"btn  btn-default"}),'<span class="glyphicon glyphicon-trash"></span>')
 	+'</row>');
 };
+DB.toFind.seralize=function($row){
+	return $($row).map(function(){
+		return $(this).find('select,input').map(function(){
+			var d=this.nodeName=='INPUT'?"'":"";
+			return d+$(this).val()+d;
+		}).toArray()
+	}).toArray();
+}

@@ -14,7 +14,6 @@ $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
 	console.warn(this,arguments);
 })
 
-
 function ressource_cell(args,val,type){
 	function btn(ico,oc){return $('<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
 	if(type=='id')
@@ -25,10 +24,10 @@ function ressource_cell(args,val,type){
 				}).bind(this))
 			}))
 			.append(btn('pencil'  ,function(){
+				$('#Modal').modal('show');
 				DB('option',args.table).success(
 					DB.toForm.bind({table:args.table,target:'#Modal .modal-body',id:val})
 				);
-				$('#Modal').modal('show');
 			}));
 	if(type=='href')
 		return $('<a href="'+val+'">').html('#'+val);
@@ -65,18 +64,16 @@ function ressource_cell(args,val,type){
 	list-style: none;
 	margin:0;
 }
-.query .row:first-child select[name=j]{
+.query .row:first-child>*:first-child{
 	visibility: hidden;
 }
-.query .row:first-child [name=remove]{
+.query .row:first-child .btn{
 	display: none;
 }
-.query .row [name=val]{
-}
-.query .row [name=remove]{
+.query .row .btn{
 	visibility: hidden;
 }
-.query .row:hover [name=remove]{
+.query .row:hover .btn{
 	visibility: visible;
 }
 </style>
@@ -94,7 +91,8 @@ function ressource_cell(args,val,type){
 				Alert('success','Ressource:'+id);
 			}}));">add</button>
 		<button onclick="DB('get'   ,'ressource').success(DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));">listAll</button>
-		<button onclick="DB('option','ressource').success(DB.toFind.bind({target:'.query'}));">find</button>
+		<button onclick="DB('option','ressource').success(DB.toFind.bind({target:'.query'}));">show form</button>
+		<button onclick="DB.toFind.seralize('.query .row').join(' ');">search</button>
 	</div>
 	<div id="out"></div>
 </div>
