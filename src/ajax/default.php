@@ -31,8 +31,14 @@ function deleteDefault($p,$param,$url){
 	if(count($p)==3)return DB_json("DELETE FROM $p[0] WHERE $p[1] = '$p[2]'");
 }
 //SEARCH
-function searchDefault($p,$param,$url){
-	return var_dump($param);
+function findDefault($p,$param,$url){
+	$j=array('&'=>'AND','|'=>'OR');
+	$op=array('~'=>'LIKE','='=>'=','!'=>'!=','<'=>'<','>'=>'>');
+	preg_match_all("/([&|])(\w+)([~=!<>])([^&|]*)/",urldecode($p[1]),$a);
+	$sql="SELECT * FROM $p[0] WHERE";
+	foreach($a[1] as $i=>$val)
+		$sql.= ($i>0?$j[$a[1][$i]]:'').' '.$a[2][$i].' '.$op[$a[3][$i]]." '".$a[4][$i]."' ";
+	return DB_json($sql);
 }
 
 //POST

@@ -44,7 +44,7 @@ DB.toList=function(json){
 	$(args.target).html(
 		$('<table class="table">').addClass(args.table_class)
 			.append($('<thead>').append($('<tr>').append(json.length==0?'<td>empty</td>':
-				Object.keys(json[0]).map(function(a){return $('<th>'+DB.space(a)+'</th>')}))))
+				Object.keys(json[0]).map(function(a){return $('<th><label>'+DB.space(a)+'</label></th>')}))))
 			.append($('<tbody>').append(
 				json.map(function(row){return $("<tr>").append($.map(row,function(val,col){
 					return $('<td>').append(args.cell?args.cell(args,val,col):row[col]);
@@ -86,9 +86,9 @@ DB.toFind=function(json){
 	json.forEach(function(a){collumns[a.Field]=DB.space(a.Field);})
 	
 	return $(args.target).html('<div class="row">'
-		+formgrp('select','',obj2opt({AND:"et",OR:"ou"}))
+		+formgrp('select','',obj2opt({'&':"et",'|':"ou"}))
 		+formgrp('select','',obj2opt(collumns))
-		+formgrp('select','',obj2opt({"LIKE":"&#8776;","=":"=","!=":"&ne;","<":"&lt;",">":"&gt;",}))
+		+formgrp('select','',obj2opt({"~":"&#8776;","=":"=","!":"&ne;","<":"&lt;",">":"&gt;",}))
 		+formgrp('input' ,'','')
 		+formgrp('button',obj2att({type:"button",onclick:"$(this).closest('.row').remove();","class":"btn  btn-default"}),'<span class="glyphicon glyphicon-trash"></span>')
 	+'</row>');
@@ -96,8 +96,7 @@ DB.toFind=function(json){
 DB.toFind.seralize=function($row){
 	return $($row).map(function(){
 		return $(this).find('select,input').map(function(){
-			var d=this.nodeName=='INPUT'?"'":"";
-			return d+$(this).val()+d;
+			return $(this).val();
 		}).toArray()
 	}).toArray();
 }

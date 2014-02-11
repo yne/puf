@@ -92,12 +92,13 @@ function ressource_cell(args,val,type){
 			}}));">add</button>
 		<button onclick="DB('get'   ,'ressource').success(DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));">listAll</button>
 		<button onclick="DB('option','ressource').success(DB.toFind.bind({target:'.query'}));">show form</button>
-		<button onclick="DB.toFind.seralize('.query .row').join(' ');">search</button>
+		<button onclick="DB('find','ressource/'+DB.toFind.seralize('.query .row').join('')).success(DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));">search</button>
 	</div>
 	<div id="out"></div>
 </div>
 </body>
 <script src="ajax.js"></script>
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<script>DB('option','ressource').success(DB.toFind.bind({target:'.query'}));</script>
 </html>
 
