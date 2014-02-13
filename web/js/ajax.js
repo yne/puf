@@ -39,7 +39,7 @@ DB.Type={
 };
 
 //Requests
-localStorage.list=localStorage.list||'{"hidden_col":[]}';
+localStorage.list=localStorage.list||'{"hidden_col":[],"label":{}}';
 
 DB.toList=function(json){
 	function li(arg){return $('<li style="display:table-cell"><a><span class="glyphicon glyphicon-'+arg[0]+'"></span></a></li>').on('click',arg[1]);}
@@ -54,9 +54,13 @@ DB.toList=function(json){
 			localStorage.list=JSON.stringify(list);
 		}],
 		['pencil',function(){
-			var name=$(this).closest('th').attr('name');
-			var label=$(this).closest('th').find('label').text();
-			var res=prompt("New label for "+name,label);
+			var $th=$(this).closest('th')
+			var name=$th.attr('name');
+			var label=$th.find('label').text();
+			var list=JSON.parse(localStorage.list);
+			list.label[name]=prompt("New label for "+name,label);
+			localStorage.list=JSON.stringify(list);
+			$th.find('label').html(list.label[name]||DB.space(name));
 		}],
 		['eye-open',function(){
 			$(this).closest('table').find('th[name],td[name]').show();
@@ -67,19 +71,18 @@ DB.toList=function(json){
 	];
 	var args=this;
 	var list=JSON.parse(localStorage.list);
-	var hide=list.hidden_col;
 	$(args.target).html(
 		$('<table class="table">').addClass(args.table_class)
 			.append($('<thead>').append($('<tr>').append(json.length==0?'<td>empty</td>':
 				Object.keys(json[0]).map(function(col){
-					return $($('<th name="'+col+'">').toggle(hide.indexOf(col)<0).append(
+					return $($('<th name="'+col+'">').toggle(list.hidden_col.indexOf(col)<0).append(
 						$('<div class="btn-group">')
-						.append($('<label class="btn btn-link dropdown-toggle" data-toggle="dropdown">').html(DB.space(col)))
+						.append($('<label class="btn btn-link dropdown-toggle" data-toggle="dropdown">').html(list.label[col] || DB.space(col)))
 						.append($('<ul class="dropdown-menu">').append(lis.map(li)))
 					))}))))
 			.append($('<tbody>').append(
 				json.map(function(row){return $("<tr>").append($.map(row,function(val,col){
-					$cell=$('<td name="'+col+'">').append(args.cell?args.cell(args,val,col):row[col]).toggle(hide.indexOf(col)<0);
+					$cell=$('<td name="'+col+'">').append(args.cell?args.cell(args,val,col):row[col]).toggle(list.hidden_col.indexOf(col)<0);
 					return $cell;
 				}))})
 			))
