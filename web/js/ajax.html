@@ -30,7 +30,7 @@ function ressource_cell(args,val,type){
 				);
 			}));
 	if(type=='href')
-		return $('<a href="'+val+'">').html('#'+val);
+		return $('<a href="'+val+'">').html('<span class="glyphicon glyphicon-share-alt"></span>');
 	if(['fichedev','bdd','photo'].indexOf(type)>=0)
 		return val*1?'&#10004;':'&#10008;';
 	return val;
@@ -79,7 +79,9 @@ function ressource_cell(args,val,type){
 </style>
 
 <div class="container">
-	<form class="form-inline">
+	<form class="form-inline" onsubmit="DB('find','ressource/'+DB.toFind.seralize('.query .row').join('')).success(
+		DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));
+		return false;">
 		<h3>Critere de recherche</h3>
 		<div class="query"></div>
 		<div id="addQuery" class="btn btn-link" onclick="$('.query .row:first').clone().appendTo('.query');">Ajouter un critère supplémentaire</div>
@@ -91,14 +93,17 @@ function ressource_cell(args,val,type){
 				Alert('success','Ressource:'+id);
 			}}));">add</button>
 		<button onclick="DB('get'   ,'ressource').success(DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));">listAll</button>
-		<button onclick="DB('option','ressource').success(DB.toFind.bind({target:'.query'}));">show form</button>
-		<button onclick="DB('find','ressource/'+DB.toFind.seralize('.query .row').join('')).success(DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));">search</button>
 	</div>
 	<div id="out"></div>
 </div>
 </body>
 <script src="ajax.js"></script>
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-<script>DB('option','ressource').success(DB.toFind.bind({target:'.query'}));</script>
+<script>
+	DB('option','ressource').success(DB.toFind.bind({target:'.query'}));
+	if(document.location.hash.length>1)
+		DB('find','ressource/'+document.location.hash.slice(1)).success(
+		DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));
+</script>
 </html>
 
