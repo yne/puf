@@ -44,8 +44,20 @@ localStorage.list=localStorage.list||'{"hidden_col":[],"label":{}}';
 DB.toList=function(json){
 	function li(arg){return $('<li style="display:table-cell"><a><span class="glyphicon glyphicon-'+arg[0]+'"></span></a></li>').on('click',arg[1]);}
 	var lis=[
-		['sort-by-attributes',function(){var name=$(this).closest('th').attr('name');}],
-		['sort-by-attributes-alt',function(){var name=$(this).closest('th').attr('name');}],
+		['sort-by-attributes',function(){
+			var name=$(this).closest('th').attr('name');
+			var $tbody=$(this).closest('table').find('tbody');
+			$tbody.html($tbody.find('tr').get().sort(function(a,b){
+				return(+$(a).find('[name="'+name+'"]').text().localeCompare($(b).find('[name="'+name+'"]').text()));
+			}));
+		}],
+		['sort-by-attributes-alt',function(){
+			var name=$(this).closest('th').attr('name');
+			var $tbody=$(this).closest('table').find('tbody');
+			$tbody.html($tbody.find('tr').get().sort(function(a,b){
+				return(-$(a).find('[name="'+name+'"]').text().localeCompare($(b).find('[name="'+name+'"]').text()));
+			}))
+		}],
 		['eye-close',function(){
 			var name=$(this).closest('th').attr('name');
 			$(this).closest('table').find('th[name="'+name+'"],td[name="'+name+'"]').hide();
@@ -75,7 +87,7 @@ DB.toList=function(json){
 		$('<table class="table">').addClass(args.table_class)
 			.append($('<thead>').append($('<tr>').append(json.length==0?'<td>empty</td>':
 				Object.keys(json[0]).map(function(col){
-					return $($('<th name="'+col+'">').toggle(list.hidden_col.indexOf(col)<0).append(
+					return $($('<th name="'+col+'" title="'+col+'">').toggle(list.hidden_col.indexOf(col)<0).append(
 						$('<div class="btn-group">')
 						.append($('<label class="btn btn-link dropdown-toggle" data-toggle="dropdown">').html(list.label[col] || DB.space(col)))
 						.append($('<ul class="dropdown-menu">').append(lis.map(li)))
