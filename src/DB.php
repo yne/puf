@@ -1,8 +1,6 @@
 <?php
 
 function DB_json($sql){
-//	return $sql;
-
 	$file=realpath(dirname(__FILE__))."/conf.ini";
 	if(!file_exists($file))throw new Exception("conf.ini is missing");
 	$ini = parse_ini_file($file, true);
@@ -22,7 +20,7 @@ function DB_json($sql){
 		  ||!isset($ini['user'][$_SERVER['PHP_AUTH_USER']])
 			|| $ini['user'][$_SERVER['PHP_AUTH_USER']] != md5($_SERVER['PHP_AUTH_PW'])
 			){
-			header('WWW-Authenticate: Basic realm="My Realm"');
+			header('WWW-Authenticate: Basic realm="BackOffice"');
 			header('HTTP/1.0 401 Unauthorized');
 			throw new Exception("No credential on protected zone");
 		}
@@ -30,4 +28,8 @@ function DB_json($sql){
 
 	$statement->execute();
 	return $pdo->lastInsertId();
+}
+
+function DB_sanitize($str){
+	return preg_replace("/[\\']/","_",$str);
 }

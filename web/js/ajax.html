@@ -14,6 +14,17 @@ $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
 	console.warn(this,arguments);
 })
 
+function ressource_edit(){
+	$('#Modal').modal('show');
+	DB('option','ressource').success(
+		DB.toForm.bind({table:'ressource',target:'#Modal .modal-body',id:this.id,success:function(id){
+			$('#Modal').modal('hide');
+			Alert('success',(this.id?'Modified':'New')+' Ressource:'+id);
+	}}));
+}
+function ressource_list(){
+	return DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'})
+}
 function ressource_cell(args,val,type){
 	function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
 	if(type=='id')
@@ -23,13 +34,7 @@ function ressource_cell(args,val,type){
 					return $(this).closest('tr').fadeOut(500);
 				}).bind(this))
 			}))
-			.append(btn('pencil'  ,function(){
-				$('#Modal').modal('show');
-				DB('option',args.table).success(
-					DB.toForm.bind({table:args.table,target:'#Modal .modal-body',id:val,
-						success:function(){$('#Modal').modal('hide');}})
-				);
-			}));
+			.append(btn('pencil'  ,ressource_edit.bind({id:val})));
 	if(type=='href')
 		return $('<a href="'+val+'">').html('<span class="glyphicon glyphicon-share-alt"></span>');
 	if(['fichedev','bdd','photo'].indexOf(type)>=0)
@@ -86,14 +91,10 @@ function ressource_cell(args,val,type){
 		<div id="addQuery" class="btn btn-link" onclick="$('.query .row:first').clone().appendTo('.query');">Ajouter un critère supplémentaire</div>
 	</form>
 	<div>
-		<button onclick="$('#Modal').modal('show');
-			DB('option','ressource').success(DB.toForm.bind({target:'#Modal .modal-body',table:'ressource',success:function(id){
-				$('#Modal').modal('hide');
-				Alert('success','Ressource:'+id);
-			}}));">add</button>
-		<button onclick="DB('get'   ,'ressource').success(DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));">listAll</button>
+		<button onclick="ressource_edit()">add</button>
+		<button onclick="DB('get'   ,'ressource').success(ressource_list());">listAll</button>
 	</div>
-	<div id="out"></div>
+	<div id="out" class="table-responsive"></div>
 </div>
 </body>
 <script src="ajax.js"></script>
@@ -101,9 +102,7 @@ function ressource_cell(args,val,type){
 <script>
 	(window.onhashchange=function(ev){//search when query changed/init
 		if(URL(ev.newURL).hash.length<=1)return;//no more hash => do nothing
-		DB('find','ressource/'+URL(ev.newURL).hash.slice(1)).success(//do the search
-			DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'})
-		);
+		DB('find','ressource/'+URL(ev.newURL).hash.slice(1)).success(ressource_list());//do the search
 	})({newURL:document.location.href});//trigger to take into account initial hash
 	
 	DB('option','ressource').success(DB.toSearchForm.bind({target:'.query'}));

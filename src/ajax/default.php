@@ -32,12 +32,16 @@ function deleteDefault($p,$param,$url){
 }
 //SEARCH
 function findDefault($p,$param,$url){
-	$j=array('&'=>'AND','|'=>'OR');
+	$j =array('&'=>'AND','|'=>'OR');
 	$op=array('~'=>'LIKE','='=>'=','!'=>'!=','<'=>'<','>'=>'>');
 	preg_match_all("/([&|])(\w+)([~=!<>])([^&|]*)/",urldecode($p[1]),$a);
 	$sql="SELECT * FROM $p[0] WHERE";
-	foreach($a[1] as $i=>$val)
-		$sql.= ($i>0?$j[$a[1][$i]]:'').' '.$a[2][$i].' '.$op[$a[3][$i]]." '".$a[4][$i]."' ";
+	foreach($a[1] as $i=>$val){
+		$a[4][$i]=DB_sanitize($a[4][$i]);
+		$a[2][$i]=DB_sanitize($a[2][$i]);
+		if($op[$a[3][$i]]=='LIKE')$a[4][$i]='%'.$a[4][$i].'%';
+		$sql.= ($i>0?$j[$a[1][$i]]:'')." {$a[2][$i]} {$op[$a[3][$i]]} '{$a[4][$i]}' ";
+	}
 	return DB_json($sql);
 }
 
