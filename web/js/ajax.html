@@ -15,7 +15,7 @@ $(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
 })
 
 function ressource_cell(args,val,type){
-	function btn(ico,oc){return $('<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
+	function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
 	if(type=='id')
 		return $('<div class="btn-group" style="display:flex" title="'+val+'">')
 			.append(btn('trash'   ,function(){
@@ -26,7 +26,8 @@ function ressource_cell(args,val,type){
 			.append(btn('pencil'  ,function(){
 				$('#Modal').modal('show');
 				DB('option',args.table).success(
-					DB.toForm.bind({table:args.table,target:'#Modal .modal-body',id:val})
+					DB.toForm.bind({table:args.table,target:'#Modal .modal-body',id:val,
+						success:function(){$('#Modal').modal('hide');}})
 				);
 			}));
 	if(type=='href')
@@ -79,9 +80,7 @@ function ressource_cell(args,val,type){
 </style>
 
 <div class="container">
-	<form class="form-inline" onsubmit="DB('find','ressource/'+DB.toFind.seralize('.query .row').join('')).success(
-		DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));
-		return false;">
+	<form class="form-inline" onsubmit="document.location.hash=DB.form2param('.query .row').join('');return false;">
 		<h3>Critere de recherche</h3>
 		<div class="query"></div>
 		<div id="addQuery" class="btn btn-link" onclick="$('.query .row:first').clone().appendTo('.query');">Ajouter un critère supplémentaire</div>
@@ -100,10 +99,14 @@ function ressource_cell(args,val,type){
 <script src="ajax.js"></script>
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 <script>
-	DB('option','ressource').success(DB.toFind.bind({target:'.query'}));
-	if(document.location.hash.length>1)
-		DB('find','ressource/'+document.location.hash.slice(1)).success(
-		DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'}));
+	(window.onhashchange=function(ev){//search when query changed/init
+		if(URL(ev.newURL).hash.length<=1)return;//no more hash => do nothing
+		DB('find','ressource/'+URL(ev.newURL).hash.slice(1)).success(//do the search
+			DB.toList.bind({target:'#out',cell:ressource_cell,table:'ressource',table_class:'table-condensed'})
+		);
+	})({newURL:document.location.href});//trigger to take into account initial hash
+	
+	DB('option','ressource').success(DB.toSearchForm.bind({target:'.query'}));
 </script>
 </html>
 

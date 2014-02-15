@@ -87,9 +87,9 @@ DB.toList=function(json){
 		$('<table class="table">').addClass(args.table_class)
 			.append($('<thead>').append($('<tr>').append(json.length==0?'<td>empty</td>':
 				Object.keys(json[0]).map(function(col){
-					return $($('<th name="'+col+'" title="'+col+'">').toggle(list.hidden_col.indexOf(col)<0).append(
+					return $($('<th name="'+col+'">').toggle(list.hidden_col.indexOf(col)<0).append(
 						$('<div class="btn-group">')
-						.append($('<label class="btn btn-link dropdown-toggle" data-toggle="dropdown">').html(list.label[col] || DB.space(col)))
+						.append($('<label title="'+col+'" class="btn btn-link dropdown-toggle" data-toggle="dropdown">').html(list.label[col] || DB.space(col)))
 						.append($('<ul class="dropdown-menu">').append(lis.map(li)))
 					))}))))
 			.append($('<tbody>').append(
@@ -109,11 +109,10 @@ DB.toForm=function(json){
 		+'<input type="reset"  class="btn btn-default"/>'
 		+'<input type="submit" class="btn btn-primary pull-right"/>'
 		+'</div></form>');
-	//args.submit
 	$form.on('submit',function(event){
-		var arg = {};
-		$.map($(this).serializeArray(),function(n){arg[n.name] = n.value;});
-		$.ajax('/'+args.table,{type:"put",data:JSON.stringify(arg)}).success(args.success);
+		var col = {};
+		$.map($(this).serializeArray(),function(n){col[n.name] = n.value;});
+		$.ajax('/'+args.table,{type:"put",data:JSON.stringify(col)}).success(args.success);
 		event.preventDefault();
 		return 0;
 	});
@@ -125,23 +124,36 @@ DB.toForm=function(json){
 	});
 };
 
-DB.toFind=function(json){
+DB.toSearchForm=function(json){
 	var args=this;
 	function obj2att(obj){return $.map(obj,function(a,b){return b+'="'+a+'"'}).join(' ')}
-	function obj2opt(obj){return $.map(obj,function(a,b){return '<option value="'+b+'">'+a+'</option>'}).join('')}
-	function formgrp(tag,attr,html){return '<div class="form-group"><'+tag+' '+attr+' class="form-control">'+html+'</'+tag+'></div>';}
+	function obj2opt(obj){return $.map(obj,function(a,b){return $('<option value="'+b+'">').html(a)})}
+	function formgrp(tag,attr,html,val){return $('<div class="form-group">').append($('<'+tag+' '+attr+' class="form-control">').html(html)[val?'val':'last'](val));}
+	function newLine(all,j,cal,op,val){return $('<div class="row">').append([
+			formgrp('select','',obj2opt({'&':"et",'|':"ou"}),j),
+			formgrp('select','',obj2opt(collumns),cal),
+			formgrp('select','',obj2opt({"~":"&#8776;","=":"=","!":"&ne;","<":"&lt;",">":"&gt;",}),op),
+			formgrp('input' ,'','',val),
+			formgrp('button',obj2att({type:"button",onclick:"$(this).closest('.row').remove();","class":"btn  btn-default"}),'<span class="glyphicon glyphicon-trash"></span>')
+		]);
+	}
+	function param2lines(params){
+		var exp="([&|])(\\w+)([~=!<>])([^&|]*)";
+		return params.slice(1).match(new RegExp(exp,'g')).map(function(a){
+			return newLine.apply(this,a.match(new RegExp(exp)));
+		});
+	}
 	var collumns={};
-	json.forEach(function(a){collumns[a.Field]=DB.space(a.Field);})
+	var list=JSON.parse(localStorage.list);
+	json.forEach(function(a){collumns[a.Field]=(list.label[a.Field]||DB.space(a.Field));})
 	
-	return $(args.target).html('<div class="row">'
-		+formgrp('select','',obj2opt({'&':"et",'|':"ou"}))
-		+formgrp('select','',obj2opt(collumns))
-		+formgrp('select','',obj2opt({"~":"&#8776;","=":"=","!":"&ne;","<":"&lt;",">":"&gt;",}))
-		+formgrp('input' ,'','')
-		+formgrp('button',obj2att({type:"button",onclick:"$(this).closest('.row').remove();","class":"btn  btn-default"}),'<span class="glyphicon glyphicon-trash"></span>')
-	+'</row>');
+	if(document.location.hash.length>1){
+		$(args.target).html(param2lines(document.location.hash));
+	}else{
+		$(args.target).html(newLine());
+	}
 };
-DB.toFind.seralize=function($row){
+DB.form2param=function($row){
 	return $($row).map(function(){
 		return $(this).find('select,input').map(function(){
 			return $(this).val();
