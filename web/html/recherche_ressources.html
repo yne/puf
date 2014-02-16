@@ -9,7 +9,7 @@
 		<button onclick="ressource_edit()">add</button>
 		<button onclick="DB('get','ressource').success(ressource_list());">listAll</button>
 	</div-->
-	<div id="ressource_results"></div>
+	<div class="table-overflow" id="results_list"></div>
 </div>
 
 <script>
@@ -22,7 +22,7 @@ function ressource_edit(){
 	}}));
 }
 function ressource_list(){
-	return DB.toList.bind({target:'#ressource_results',cell:ressource_cell,table:'ressource',table_class:'table-condensed'})
+	return DB.toList.bind({target:'#results_list',cell:ressource_cell,table:'ressource',table_class:'table-condensed'})
 }
 function ressource_cell(args,val,type){
 	function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}

@@ -1,1 +1,56 @@
-﻿<h1>Recherche de sources</h1>
+﻿<div class="container">
+	<form class="form-inline" onsubmit="document.location.hash=DB.form2param('.query .row').join('');return false;">
+		<h3>Critere de recherche</h3>
+		<div class="query"></div>
+		<button type="button" class="btn btn-link" onclick="$('.query .row:first').clone().appendTo('.query');"><span class="glyphicon glyphicon-plus"></span> Ajouter un critère supplémentaire</button>
+		<button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-search"></span> Rechercher</button>
+	</form>
+	<!--div>
+		<button onclick="source_edit()">add</button>
+		<button onclick="DB('get','source').success(source_list());">listAll</button>
+	</div-->
+	<div class="table-overflow" id="results_list"></div>
+</div>
+
+<script>
+var bd_table='parcelleunitefiscale';
+Source={
+	edit:function(){//source_edit
+		$('#Modal').modal('show');
+		DB('option',bd_table).success(
+			DB.toForm.bind({table:bd_table,target:'#Modal .modal-body',id:this.id,success:function(id){
+				$('#Modal').modal('hide');
+				Alert('success',(this.id?'Modified':'New')+' source:<a href="#&id='+id+'">'+id+'</a>');
+		}}));
+	},
+	list:function(){//source_list
+		return DB.toList.bind({target:'#results_list',cell:Source.cell,table:bd_table,table_class:'table-condensed'})
+	},
+	cell:function(args,val,type){//source_cell
+		function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
+		if(type=='id')
+			return $('<div class="btn-group" style="display:flex" title="'+val+'">')
+				.append(btn('trash'   ,function(){
+					DB('delete',args.table+"/"+val).success((function(){
+						return $(this).closest('tr').fadeOut(500);
+					}).bind(this))
+				}))
+				.append(btn('pencil'  ,Source.edit.bind({id:val})));
+		if(type=='href')
+			return $('<a href="'+val+'">').html('<span class="glyphicon glyphicon-share-alt"></span>');
+		if(['fichedev','bdd','photo'].indexOf(type)>=0)
+			return val*1?'&#10004;':'&#10008;';
+		return val;
+	}
+};
+
+//deamons
+(window.onhashchange=function(ev){//search when query changed/init
+	DB.toSearchForm.call({target:'.query',hash:URL(ev.newURL).hash});//update the form
+	if(URL(ev.newURL).hash.length>1)//no more hash => do nothing
+		DB('find',bd_table+'/'+URL(ev.newURL).hash.slice(1)).success(Source.list());//do the search
+})({newURL:document.location.href});//trigger to take into account initial hash
+
+DB('option',bd_table).success(DB.toSearchForm.bind({target:'.query',hash:document.location.hash}));
+
+</script>

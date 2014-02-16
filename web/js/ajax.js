@@ -55,6 +55,7 @@ DB.list_th_btn=[
 			return(-$(a).find('[name="'+name+'"]').text().localeCompare($(b).find('[name="'+name+'"]').text()));
 		}))
 	}],
+	[],
 	['eye-close',function(){
 		var name=$(this).closest('th').attr('name');
 		$(this).closest('table').find('th[name="'+name+'"],td[name="'+name+'"]').hide();
@@ -71,30 +72,35 @@ DB.list_th_btn=[
 		localStorage.list=JSON.stringify(list);
 		$label.html(list.label[name]||DB.space(name));
 	}],
+];
+DB.list_menu_btn=[
 	['eye-open',function(){
 		$(this).closest('table').find('th[name],td[name]').show();
 		var list=JSON.parse(localStorage.list);
 		list.hidden_col=[];
 		localStorage.list=JSON.stringify(list);
 	}],
+	['floppy-disk',function(){
+		console.log('export');
+	}],
 ];
 
 DB.toList=function(json){
-	function li(arg){return $('<li style="display:table-cell"><a><span class="glyphicon glyphicon-'+arg[0]+'"></span></a></li>').on('click',arg[1]);}
+	function li(arg){return arg.length?$('<li><a><span class="glyphicon glyphicon-'+arg[0]+'"></span></a></li>').on('click',arg[1]):'<br/>';}
 	var args=this;
 	var list=JSON.parse(localStorage.list);
 	$(args.target).html(
 		$('<table class="table">').addClass(args.table_class)
 			.append($('<thead>').append($('<tr class="active">').append(json.length==0?'<td>empty</td>':
-				Object.keys(json[0]).map(function(col){
+				Object.keys(json[0]).map(function(col,i){
 					return $($('<th name="'+col+'">').toggle(list.hidden_col.indexOf(col)<0).append(
 						$('<div class="btn-group">')
-						.append($('<a title="'+col+'" class="ucf" data-toggle="dropdown">').html(list.label[col] || DB.space(col)))
-						.append($('<ul class="dropdown-menu">').append(DB.list_th_btn.map(li)))
+						.append($('<a title="'+col+'" class="ucf" data-toggle="dropdown">').html(i?(list.label[col]||DB.space(col)):'<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-cog"></span></button>'))
+						.append($('<ul class="dropdown-menu">').append(DB[i?'list_th_btn':'list_menu_btn'].map(li)))
 					))}))))
 			.append($('<tbody>').append(
 				json.map(function(row){return $("<tr>").append($.map(row,function(val,col){
-					$cell=$('<td name="'+col+'">').append(args.cell?args.cell(args,val,col):row[col]).toggle(list.hidden_col.indexOf(col)<0);
+					$cell=$('<td class="td-overflow" name="'+col+'">').append(args.cell?args.cell(args,val,col):row[col]).toggle(list.hidden_col.indexOf(col)<0);
 					return $cell;
 				}))})
 			))
@@ -134,7 +140,7 @@ DB.toSearchForm=function(json){
 	
 	function obj2att(obj){return $.map(obj,function(a,b){return b+'="'+a+'"'}).join(' ')}
 	function obj2opt(obj){return $.map(obj,function(a,b){return $('<option class="ucf" value="'+b+'">').html(a)})}
-	function formgrp(tag,attr,html,val){return $('<div class="form-group">').append($('<'+tag+' '+attr+' class="ucf form-control">').html(html)[val?'val':'last'](val));}
+	function formgrp(tag,attr,html,val){return $('<div class="form-group">').append($('<'+tag+' '+attr+' class="form-control">').html(html)[val?'val':'last'](val));}
 	function newLine(all,j,cal,op,val){return $('<div class="row">').append([
 			formgrp('select','',obj2opt({'&':"et",'|':"ou"}),j),
 			formgrp('select','',obj2opt(collumns),cal),
