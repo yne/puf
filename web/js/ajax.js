@@ -45,14 +45,14 @@ DB.list_th_btn=[
 		var name=$(this).closest('th').attr('name');
 		var $tbody=$(this).closest('table').find('tbody');
 		$tbody.html($tbody.find('tr').get().sort(function(a,b){
-			return(+$(a).find('[name="'+name+'"]').text().localeCompare($(b).find('[name="'+name+'"]').text()));
+			return(+$(a).find('[name="'+name+'"]').text().localeCompare($(b).find('[name="'+name+'"]').text(),"fr",{numeric:true,sensitivity: "base"}));
 		}));
 	}],
 	['sort-by-attributes-alt',function(){
 		var name=$(this).closest('th').attr('name');
 		var $tbody=$(this).closest('table').find('tbody');
 		$tbody.html($tbody.find('tr').get().sort(function(a,b){
-			return(-$(a).find('[name="'+name+'"]').text().localeCompare($(b).find('[name="'+name+'"]').text()));
+			return(-$(a).find('[name="'+name+'"]').text().localeCompare($(b).find('[name="'+name+'"]').text(),"fr",{numeric:true,sensitivity: "base"}));
 		}))
 	}],
 	[],
@@ -81,7 +81,12 @@ DB.list_menu_btn=[
 		localStorage.list=JSON.stringify(list);
 	}],
 	['floppy-disk',function(){
-		console.log('export');
+		var line_sep="\n",col_sep=";";
+		return location.href="data:text/csv;base64," + btoa($(this).closest('table').find('tbody tr').get().map(function(tr){
+			return $(tr).find('td').get().map(function(td){
+				return unescape($(td).attr('value')).replace(new RegExp(col_sep,'g'),'');
+			}).join(col_sep);
+		}).join(line_sep));
 	}],
 ];
 
@@ -91,7 +96,7 @@ DB.toList=function(json){
 	var list=JSON.parse(localStorage.list);
 	$(args.target).html(
 		$('<table class="table">').addClass(args.table_class)
-			.append($('<thead>').append($('<tr class="active">').append(json.length==0?'<td>empty</td>':
+			.append($('<thead>').append($('<tr class="active">').append(json.length==0?"<th>empty :'( </th>":
 				Object.keys(json[0]).map(function(col,i){
 					return $($('<th name="'+col+'">').toggle(list.hidden_col.indexOf(col)<0).append(
 						$('<div class="btn-group">')
@@ -100,7 +105,7 @@ DB.toList=function(json){
 					))}))))
 			.append($('<tbody>').append(
 				json.map(function(row){return $("<tr>").append($.map(row,function(val,col){
-					$cell=$('<td class="td-overflow" name="'+col+'">').append(args.cell?args.cell(args,val,col):row[col]).toggle(list.hidden_col.indexOf(col)<0);
+					$cell=$('<td class="td-overflow" name="'+col+'" value="'+escape(row[col])+'">').append(args.cell?args.cell(args,val,col):row[col]).toggle(list.hidden_col.indexOf(col)<0);
 					return $cell;
 				}))})
 			))
