@@ -4,23 +4,24 @@
 		<div class="query"></div>
 		<button type="button" class="btn btn-link" onclick="$('.query .row:first').clone().appendTo('.query');"><span class="glyphicon glyphicon-plus"></span> Ajouter un critère supplémentaire</button>
 		<button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-search"></span> Rechercher</button>
+		<button type="button" class="btn btn-link" onclick="Source.edit()"><span class="glyphicon glyphicon-plus"></span> Créer...</button>
 	</form>
-	<!--div>
-		<button onclick="source_edit()">add</button>
-		<button onclick="DB('get','source').success(source_list());">listAll</button>
-	</div-->
 	<div class="table-overflow" id="results_list"></div>
 </div>
 
 <script>
 var bd_table='parcelleunitefiscale';
+
 Source={
 	edit:function(){//source_edit
+		var args=this;
 		$('#Modal').modal('show');
 		DB('option',bd_table).success(
-			DB.toForm.bind({table:bd_table,target:'#Modal .modal-body',id:this.id,success:function(id){
+			DB.toForm.bind({table:bd_table,target:'#Modal .modal-body',id:args.id,success:function(id){
+				Alert('success',(id?'Created :<a href="#&id='+id+'">'+id+'</a>':'Modified'));
+				DB('get',bd_table+'/'+args.id).success(function(rows){//ask for the new version
+					DB.toRow($('tr[name='+rows[0].id+']'),rows[0],{cell:Source.cell,list:JSON.parse(localStorage.list)})});
 				$('#Modal').modal('hide');
-				Alert('success',(this.id?'Modified':'New')+' source:<a href="#&id='+id+'">'+id+'</a>');
 		}}));
 	},
 	list:function(){//source_list
@@ -36,10 +37,6 @@ Source={
 					}).bind(this))
 				}))
 				.append(btn('pencil'  ,Source.edit.bind({id:val})));
-		if(type=='href')
-			return $('<a href="'+val+'">').html('<span class="glyphicon glyphicon-share-alt"></span>');
-		if(['fichedev','bdd','photo'].indexOf(type)>=0)
-			return val*1?'&#10004;':'&#10008;';
 		return val;
 	}
 };
