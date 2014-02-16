@@ -9,7 +9,7 @@ DB.space=function(title){
 		.toLowerCase();
 }
 DB.toInput=function(col){
-	var el=DB.Type[col.Type.match(/\w+/)[0].toUpperCase()];
+	var el=DB.Type[(col.Type.match(/\w+/)||['varchar'])[0].toUpperCase()];
 	el.maxlength=(col.Type.match(/\d+/)||[''])[0];
 	$.extend(el,{name:col.Field,id:el.name+Date.now(),title:col.Comment});
 	//if(col.Null=='NO' && el.type!='checkbox')el.required='required';//avoid forced checkbox
@@ -36,19 +36,20 @@ DB.Type={
 	CHAR     :{type:'text'},
 	VARCHAR  :{type:'text'},
 	TEXT     :{type:'textarea'},
+	LONGTEXT :{type:'textarea'},
 };
 
 //Requests
 localStorage.list=localStorage.list||'{"hidden_col":[],"label":{}}';
 DB.list_th_btn=[
-	['sort-by-attributes',function(){
+	['sort-by-attributes',"Ascendant",function(){
 		var name=$(this).closest('th').attr('name');
 		var $tbody=$(this).closest('table').find('tbody');
 		$tbody.html($tbody.find('tr').get().sort(function(a,b){
 			return(+$(a).find('[name="'+name+'"]').text().localeCompare($(b).find('[name="'+name+'"]').text(),"fr",{numeric:true,sensitivity: "base"}));
 		}));
 	}],
-	['sort-by-attributes-alt',function(){
+	['sort-by-attributes-alt',"Descendant",function(){
 		var name=$(this).closest('th').attr('name');
 		var $tbody=$(this).closest('table').find('tbody');
 		$tbody.html($tbody.find('tr').get().sort(function(a,b){
@@ -56,14 +57,14 @@ DB.list_th_btn=[
 		}))
 	}],
 	[],
-	['eye-close',function(){
+	['eye-close',"Hide",function(){
 		var name=$(this).closest('th').attr('name');
 		$(this).closest('table').find('th[name="'+name+'"],td[name="'+name+'"]').hide();
 		var list=JSON.parse(localStorage.list);
 		list.hidden_col.push(name);
 		localStorage.list=JSON.stringify(list);
 	}],
-	['pencil',function(){
+	['pencil',"Rename",function(){
 		var $th=$(this).closest('th')
 		var name=$th.attr('name');
 		var $label=$th.find('a');
@@ -74,13 +75,13 @@ DB.list_th_btn=[
 	}],
 ];
 DB.list_menu_btn=[
-	['eye-open',function(){
+	['eye-open',"Show all",function(){
 		$(this).closest('table').find('th[name],td[name]').show();
 		var list=JSON.parse(localStorage.list);
 		list.hidden_col=[];
 		localStorage.list=JSON.stringify(list);
 	}],
-	['floppy-disk',function(){
+	['floppy-disk',"Export",function(){
 		var line_sep="\n",col_sep=";";
 		return location.href="data:text/csv;base64," + btoa($(this).closest('table').find('tbody tr').get().map(function(tr){
 			return $(tr).find('td').get().map(function(td){
@@ -89,25 +90,26 @@ DB.list_menu_btn=[
 		}).join(line_sep));
 	}],
 ];
-
+DB.toRow=function($target,row,args){
+	return $target.html($.map(row,function(val,col){
+		$cell=$('<td class="td-overflow" name="'+col+'" value="'+escape(row[col])+'">').append(args.cell?args.cell(args,val,col):row[col]).toggle(args.list.hidden_col.indexOf(col)<0);
+		return $cell;}));
+}
 DB.toList=function(json){
-	function li(arg){return arg.length?$('<li><a><span class="glyphicon glyphicon-'+arg[0]+'"></span></a></li>').on('click',arg[1]):'<br/>';}
+	function li(arg){return arg.length?$('<li><a title="'+arg[1]+'"><span class="glyphicon glyphicon-'+arg[0]+'"></span></a></li>').on('click',arg[2]):'<br/>';}
 	var args=this;
-	var list=JSON.parse(localStorage.list);
+	args.list=args.list||JSON.parse(localStorage.list);
 	$(args.target).html(
 		$('<table class="table">').addClass(args.table_class)
 			.append($('<thead>').append($('<tr class="active">').append(json.length==0?"<th>empty :'( </th>":
 				Object.keys(json[0]).map(function(col,i){
-					return $($('<th name="'+col+'">').toggle(list.hidden_col.indexOf(col)<0).append(
+					return $($('<th name="'+col+'">').toggle(args.list.hidden_col.indexOf(col)<0).append(
 						$('<div class="btn-group">')
-						.append($('<a title="'+col+'" class="ucf" data-toggle="dropdown">').html(i?(list.label[col]||DB.space(col)):'<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-cog"></span></button>'))
+						.append($('<a title="'+col+'" class="ucf" data-toggle="dropdown">').html(i?(args.list.label[col]||DB.space(col)):'<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-cog"></span></button>'))
 						.append($('<ul class="dropdown-menu">').append(DB[i?'list_th_btn':'list_menu_btn'].map(li)))
 					))}))))
 			.append($('<tbody>').append(
-				json.map(function(row){return $("<tr>").append($.map(row,function(val,col){
-					$cell=$('<td class="td-overflow" name="'+col+'" value="'+escape(row[col])+'">').append(args.cell?args.cell(args,val,col):row[col]).toggle(list.hidden_col.indexOf(col)<0);
-					return $cell;
-				}))})
+				json.map(function(row){return DB.toRow($('<tr name="'+row.id+'">'),row,args)})
 			))
 	)
 };
