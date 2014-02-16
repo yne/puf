@@ -13,7 +13,7 @@
 var bd_table='parcelleunitefiscale';
 
 Source={
-	edit:function(){//source_edit
+	edit:function(){
 		var args=this;
 		$('#Modal').modal('show');
 		DB('option',bd_table).success(
@@ -24,10 +24,10 @@ Source={
 				$('#Modal').modal('hide');
 		}}));
 	},
-	list:function(){//source_list
+	list:function(){
 		return DB.toList.bind({target:'#results_list',cell:Source.cell,table:bd_table,table_class:'table-condensed'})
 	},
-	cell:function(args,val,type){//source_cell
+	cell:function(args,val,type){
 		function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
 		if(type=='id')
 			return $('<div class="btn-group" style="display:flex" title="'+val+'">')

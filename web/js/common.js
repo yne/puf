@@ -20,6 +20,7 @@
 });
 
 Alert=function(type,msg){ /* info,success,warning,danger */
+	console.log(type,msg);
 	$("#Alert").removeClass().addClass("alert fade in alert-"+type)
 		.html(msg).slideDown(400).delay(4000).slideUp(400);
 }

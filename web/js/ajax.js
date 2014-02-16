@@ -123,6 +123,7 @@ DB.toForm=function(json){
 		+'<input type="submit" class="btn btn-primary pull-right"/>'
 		+'</div></form>');
 	$form.on('submit',function(event){
+		if(args.submit)args.submit(event);
 		var col = {};
 		$.map($(this).serializeArray(),function(n){col[n.name] = n.value;});
 		$.ajax('/'+args.table,{type:"put",data:JSON.stringify(col)}).success(args.success);

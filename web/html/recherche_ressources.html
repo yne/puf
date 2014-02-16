@@ -17,9 +17,15 @@ Ressource={
 		var args=this;
 		$('#Modal').modal('show');
 		DB('option',bd_table).success(
-			DB.toForm.bind({table:bd_table,target:'#Modal .modal-body',id:args.id,success:function(id){
+			DB.toForm.bind({table:bd_table,target:'#Modal .modal-body',id:args.id,
+			submit:function(event){
+				$form=$(event.target);
+				var id=$form.find('[name=nocommune]').val()*10000+$form.find('[name=date]').val()*1;
+				$form.find('[name=id]').val(id);
+			},
+			success:function(id){
 				Alert('success',(id?'Created :<a href="#&id='+id+'">'+id+'</a>':'Modified'));
-				DB('get',bd_table+'/'+args.id).success(function(rows){//ask for the new version
+				if(args.id)DB('get',bd_table+'/'+args.id).success(function(rows){//modified : ask for the new version
 					DB.toRow($('tr[name='+rows[0].id+']'),rows[0],{cell:Ressource.cell,list:JSON.parse(localStorage.list)})});
 				$('#Modal').modal('hide');
 		}}));

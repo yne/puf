@@ -12,6 +12,8 @@ function putDefault($p,$param,$url){
 	foreach ($param as $key => $value)
 		array_push($set,"$key='$value'");
 	return DB_json("UPDATE $p[0] SET ".implode(',',$set)." WHERE id = $param->id");
+//	$sql="INSERT INTO $p[0] (".implode(",",array_keys((array)$param)).") VALUES ('".implode("','",array_values((array)$param))."')";
+//	return DB_json($sql.((isset($param->id) && $param->id!='')?' ON DUPLICATE KEY UPDATE id = '.$param->id:''));
 }
 // PATCH:/res/id/attr/val
 function patchDefault($p,$param,$url){
