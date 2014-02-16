@@ -4,9 +4,38 @@ body{
 .navbar{
 	background-image: url(/img/banner_bg.png);
 }
-label{
+.ucf{
 	text-transform:capitalize;
 }
 a{
 	cursor:pointer;
+}
+
+#Alert{
+	bottom: 1em;
+	display: inline;
+	position: fixed;
+	right: 1em;
+	display: none;
+}
+
+#ressource_results{
+	
+}
+
+.query{
+	list-style: none;
+	margin:0;
+}
+.query .row:first-child>*:first-child{
+	visibility: hidden;
+}
+.query .row:first-child .btn{
+	display: none;
+}
+.query .row .btn{
+	visibility: hidden;
+}
+.query .row:hover .btn{
+	visibility: visible;
 }

@@ -1,6 +1,6 @@
 ﻿$(function(){
 	//avoid hidden content on floating menu
-//	if($('.navbar-fixed-top'))$('body').css('padding-top','50px');
+	if($('.navbar-fixed-top').size())$('body').css('padding-top','50px');
 	$('#menu').fadeOut(0).html(menu2bootstrap(Menu)).fadeIn();
 	$("#menu a:not([href^='#'])").click(function(event){
 		$(this).closest('.open').removeClass('open');
@@ -17,4 +17,14 @@
 		});
 		old_pathname=location.pathname;
 	},200);
+});
+
+Alert=function(type,msg){ /* info,success,warning,danger */
+	$("#Alert").removeClass().addClass("alert fade in alert-"+type)
+		.html(msg).slideDown(400).delay(4000).slideUp(400);
+}
+
+$(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
+	Alert('danger',thrownError);
+	console.warn(this,arguments);
 });

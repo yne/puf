@@ -1,1 +1,53 @@
-<h1>Recherche de ressources</h1>
+﻿<div class="container">
+	<form class="form-inline" onsubmit="document.location.hash=DB.form2param('.query .row').join('');return false;">
+		<h3>Critere de recherche</h3>
+		<div class="query"></div>
+		<button type="button" class="btn btn-link" onclick="$('.query .row:first').clone().appendTo('.query');"><span class="glyphicon glyphicon-plus"></span> Ajouter un critère supplémentaire</button>
+		<button type="submit" class="btn btn-link"><span class="glyphicon glyphicon-search"></span> Rechercher</button>
+	</form>
+	<!--div>
+		<button onclick="ressource_edit()">add</button>
+		<button onclick="DB('get','ressource').success(ressource_list());">listAll</button>
+	</div-->
+	<div id="ressource_results"></div>
+</div>
+
+<script>
+function ressource_edit(){
+	$('#Modal').modal('show');
+	DB('option','ressource').success(
+		DB.toForm.bind({table:'ressource',target:'#Modal .modal-body',id:this.id,success:function(id){
+			$('#Modal').modal('hide');
+			Alert('success',(this.id?'Modified':'New')+' Ressource:<a href="#&id='+id+'">'+id+'</a>');
+	}}));
+}
+function ressource_list(){
+	return DB.toList.bind({target:'#ressource_results',cell:ressource_cell,table:'ressource',table_class:'table-condensed'})
+}
+function ressource_cell(args,val,type){
+	function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
+	if(type=='id')
+		return $('<div class="btn-group" style="display:flex" title="'+val+'">')
+			.append(btn('trash'   ,function(){
+				DB('delete',args.table+"/"+val).success((function(){
+					return $(this).closest('tr').fadeOut(500);
+				}).bind(this))
+			}))
+			.append(btn('pencil'  ,ressource_edit.bind({id:val})));
+	if(type=='href')
+		return $('<a href="'+val+'">').html('<span class="glyphicon glyphicon-share-alt"></span>');
+	if(['fichedev','bdd','photo'].indexOf(type)>=0)
+		return val*1?'&#10004;':'&#10008;';
+	return val;
+}
+
+//deamons
+(window.onhashchange=function(ev){//search when query changed/init
+	DB.toSearchForm.call({target:'.query',hash:URL(ev.newURL).hash});//update the form
+	if(URL(ev.newURL).hash.length>1)//no more hash => do nothing
+		DB('find','ressource/'+URL(ev.newURL).hash.slice(1)).success(ressource_list());//do the search
+})({newURL:document.location.href});//trigger to take into account initial hash
+
+DB('option','ressource').success(DB.toSearchForm.bind({target:'.query',hash:document.location.hash}));
+
+</script>
