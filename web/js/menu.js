@@ -1,15 +1,17 @@
 ﻿var Menu={
 	brand:{
-		Architerre:"/"
+		Architerre:"/",
 	},
 	left :{
 		Page:{
-			Modelespace:null,//null = section
-			Présentation:"/presentation",
-			Biographie:"/bibliographie",
-			Lien:"/liens",
-			Architerre:null,
-			'Le Projet':"/projet",
+			Modelespace:{
+				Présentation:"/presentation",
+				Biographie:"/bibliographie",
+				Lien:"/liens",
+			},
+			Architerre:{
+				Présentation:"/projet",
+			},
 		},
 		Recherche:{
 			Ressources:"/recherche/ressources",
@@ -22,24 +24,24 @@
 	}
 }
 
-
-
 function menu2bootstrap(menu){
-	function entry2bootstrap(entry,name,pos){
-		if(entry==null)
-			return (pos?'<li class="divider"></li>':'')+'<li class="dropdown-header">'+name+'</li>';
+	function entry2bootstrap(entry,name,pos,rec){
 		if(entry.constructor==String){
-			if(entry[0]=='<')return '<li>'+entry+'</li>';
+			if(entry[0]=='<')return '<li>'+entry+'</li>';//custom html tag
 			return '<li><a href="'+entry+'">'+name+'</a></li>';
 		}
-		if(entry.constructor==Object)
+		if(entry.constructor==Object){
+			if(rec>0)return (pos?'<li class="divider"></li>':'')+//divider
+				'<li class="dropdown-header">'+name+'</li>'+//section name
+				entries2bootstrap(entry,1+rec);//sub-entries
 			return '<li class="dropdown">'+
 				'<a href="#" class="dropdown-toggle" data-toggle="dropdown">'+name+' <b class="caret"></b></a>'+
-				'<ul class="dropdown-menu">'+entries2bootstrap(entry)+'</ul></li>';
+				'<ul class="dropdown-menu">'+entries2bootstrap(entry,1+rec)+'</ul></li>';
+		}
 	}
-	function entries2bootstrap(entries){
-		var html='',i=0;
-		for(var m in entries)html+=entry2bootstrap(entries[m],m,i++);
+	function entries2bootstrap(entries,rec){
+		var html='',i=0,rec=rec||0;
+		for(var m in entries)html+=entry2bootstrap(entries[m],m,i++,rec);
 		return html;
 	}
 	var brand=menu.brand?Object.keys(menu.brand)[0]:'';
