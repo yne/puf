@@ -11,12 +11,12 @@ DB.space=function(title){
 DB.toInput=function(col){
 	var el=DB.Type[(col.Type.match(/\w+/)||['varchar'])[0].toUpperCase()];
 	el.maxlength=(col.Type.match(/\d+/)||[''])[0];
-	$.extend(el,{name:col.Field,id:el.name+Date.now(),title:col.Comment});
+	$.extend(el,{name:col.Field,title:col.Comment});
 	//if(col.Null=='NO' && el.type!='checkbox')el.required='required';//avoid forced checkbox
 	
 	var tag=(el.maxlength>255)||(el.type=='textarea')?'textarea':'input';
 	return '<div class="form-group" '+(col.Extra?'hidden':'')+'>'//extra => A_I => id => user hide
-		+'<label class="ucf" for="'+el.id+'">'+DB.space(col.Field)+'</label>'
+		+'<label class="ucf">'+DB.space(col.Field)+'</label>'
 		+'<'+tag+' '
 		+$.map(el,function(v,n){return n+'="'+v+'"';}).join(' ')+' class="form-control"></'+tag+'></div>';
 };
@@ -134,7 +134,7 @@ DB.toForm=function(json){
 	//if id provided : load it values into the form
 	if(args.id!=undefined)DB('get',args.table+'/'+args.id).success(function(json){
 		for(var attr in json[0])
-			$(args.target+" [name='"+attr+"']").val(json[0][attr]);
+			$(args.target+" [name='"+attr+"']").val(json[0][attr]).prop("checked",1*json[0][attr]);
 	});
 };
 

@@ -24,7 +24,7 @@ Ressource={
 				$form.find('[name=id]').val(id);
 			},
 			success:function(id){
-				Alert('success',(id?'Created :<a href="#&id='+id+'">'+id+'</a>':'Modified'));
+				Alert('success',(args.id?'Updated':'Created')+(id?' : <a href="#&id='+id+'">'+id+'</a>':''));
 				if(args.id)DB('get',bd_table+'/'+args.id).success(function(rows){//modified : ask for the new version
 					DB.toRow($('tr[name='+rows[0].id+']'),rows[0],{cell:Ressource.cell,list:JSON.parse(localStorage.list)})});
 				$('#Modal').modal('hide');

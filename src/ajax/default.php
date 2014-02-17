@@ -6,14 +6,13 @@ function optionDefault($p,$param,$url){
 }
 // PUT:/res,{attr:val,attr2:val2...}
 function putDefault($p,$param,$url){
-	if(isset($param->id) && $param->id=='')
-		return DB_json("INSERT INTO $p[0] (".implode(",",array_keys((array)$param)).") VALUES ('".implode("','",array_values((array)$param))."')");
+	$sql="INSERT INTO $p[0] (".implode(",",array_keys((array)$param)).") VALUES ('".implode("','",array_values((array)$param))."')";
+	if(!isset($param->id) || $param->id=='')//no id provided => auto generated
+		return DB_json($sql);
 	$set=array();
 	foreach ($param as $key => $value)
 		array_push($set,"$key='$value'");
-	return DB_json("UPDATE $p[0] SET ".implode(',',$set)." WHERE id = $param->id");
-//	$sql="INSERT INTO $p[0] (".implode(",",array_keys((array)$param)).") VALUES ('".implode("','",array_values((array)$param))."')";
-//	return DB_json($sql.((isset($param->id) && $param->id!='')?' ON DUPLICATE KEY UPDATE id = '.$param->id:''));
+	return DB_json($sql.' ON DUPLICATE KEY UPDATE '.implode(',',$set));
 }
 // PATCH:/res/id/attr/val
 function patchDefault($p,$param,$url){
