@@ -17,9 +17,9 @@ Source={
 		var args=this;
 		$('#Modal').modal('show');
 		DB('option',bd_table).success(
-			DB.toForm.bind({table:bd_table,target:'#Modal .modal-body',id:args.id,success:function(id){
+			DB.toForm.bind({table:bd_table,target:'#Modal .modal-body',id:args.id,success:function(id){//id=0 on create, >0 on modified
 				Alert('success',(id?'Created :<a href="#&id='+id+'">'+id+'</a>':'Modified'));
-				DB('get',bd_table+'/'+args.id).success(function(rows){//ask for the new version
+				if(args.id)DB('get',bd_table+'/'+args.id).success(function(rows){//ask for the new version
 					DB.toRow($('tr[name='+rows[0].id+']'),rows[0],{cell:Source.cell,list:JSON.parse(localStorage.list)})});
 				$('#Modal').modal('hide');
 		}}));
@@ -31,7 +31,7 @@ Source={
 		function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
 		if(type=='id')
 			return $('<div class="btn-group" style="display:flex" title="'+val+'">')
-				.append(btn('trash'   ,function(){
+				.append(btn('trash',function(){
 					DB('delete',args.table+"/"+val).success((function(){
 						return $(this).closest('tr').fadeOut(500);
 					}).bind(this))

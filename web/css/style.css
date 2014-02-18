@@ -17,6 +17,11 @@ a{
 	position: fixed;
 	right: 1em;
 	display: none;
+	z-index: 1100;/* over modal */
+}
+
+.dropable{
+	box-shadow: 0 0 15px 15px #FFF;
 }
 
 .table thead th li{

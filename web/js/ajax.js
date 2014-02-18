@@ -128,7 +128,7 @@ DB.toForm=function(json){
 		if(args.submit)args.submit(event);
 		var col = {};
 		$.map($(this).serializeArray(),function(n){col[n.name] = n.value;});
-		$.ajax('/'+args.table,{type:"put",data:JSON.stringify(col)}).success(args.success);
+		DB('put',args.table,{data:JSON.stringify(col)}).success(args.success);
 		event.preventDefault();
 		return 0;
 	});
@@ -139,7 +139,14 @@ DB.toForm=function(json){
 			$(args.target+" [name='"+attr+"']").val(json[0][attr]).prop("checked",1*json[0][attr]);
 	});
 };
-
+DB.parseCSV=function(csv){
+	var lines=csv.split(/[\r\n]+/g);
+	while(lines[lines.length-1]=='')lines.pop();
+	if(!lines.length)return lines;
+	var best_sep=[{c:';'},{c:'\t'},{c:','}].map(function(sep){sep.i=(lines[0].match(new RegExp(sep.c,'g'))||[]).length;return sep;}).sort(function(a,b){return b.i-a.i;})[0];
+	var delimiter=((lines[0].match(/"/g)||[]).length>best_sep.i)?'"':'';
+	return lines.map(function(line){return line.split(new RegExp(best_sep.c,'g'))});
+}
 DB.toSearchForm=function(json){
 	var args=this;
 	var collumns={};

@@ -31,7 +31,7 @@ function deleteDefault($p,$param,$url){
 	if(count($p)==2)return DB_json("DELETE FROM $p[0] WHERE id = $p[1]");
 	if(count($p)==3)return DB_json("DELETE FROM $p[0] WHERE $p[1] = '$p[2]'");
 }
-//SEARCH
+// FIND
 function findDefault($p,$param,$url){
 	$j =array('&'=>'AND','|'=>'OR');
 	$op=array('~'=>'LIKE','='=>'=','!'=>'!=','<'=>'<','>'=>'>');
