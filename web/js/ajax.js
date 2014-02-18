@@ -90,11 +90,13 @@ DB.list_menu_btn=[
 		}).join(line_sep));
 	}],
 ];
+
 DB.toRow=function($target,row,args){
 	return $target.html($.map(row,function(val,col){
-		$cell=$('<td class="td-overflow" name="'+col+'" value="'+escape(row[col])+'">').append(args.cell?args.cell(args,val,col):row[col]).toggle(args.list.hidden_col.indexOf(col)<0);
+		$cell=$('<td class="td-overflow" name="'+col+'" value="'+escape(row[col])+'">').append(args.cell?args.cell(args,val,col,row):row[col])[(args.list.hidden_col.indexOf(col)>=0)?'hide':'not']();
 		return $cell;}));
 }
+
 DB.toList=function(json){
 	function li(arg){return arg.length?$('<li><a title="'+arg[1]+'"><span class="glyphicon glyphicon-'+arg[0]+'"></span></a></li>').on('click',arg[2]):'<br/>';}
 	var args=this;
@@ -105,7 +107,7 @@ DB.toList=function(json){
 				Object.keys(json[0]).map(function(col,i){
 					return $($('<th name="'+col+'">').toggle(args.list.hidden_col.indexOf(col)<0).append(
 						$('<div class="btn-group">')
-						.append($('<a title="'+col+'" class="ucf" data-toggle="dropdown">').html(i?(args.list.label[col]||DB.space(col)):'<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-cog"></span></button>'))
+						.append($('<a title="'+col+'" class="ucf" data-toggle="dropdown">').html(i?(args.list.label[col]||DB.space(col)):'<button type="button" title="Options" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-cog"></span></button>'))
 						.append($('<ul class="dropdown-menu">').append(DB[i?'list_th_btn':'list_menu_btn'].map(li)))
 					))}))))
 			.append($('<tbody>').append(

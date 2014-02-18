@@ -11,7 +11,7 @@
 
 <script>
 var bd_table='ressource';
-
+//<button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="top" title="Tooltip on top">Tooltip on top</button>
 Ressource={
 	edit:function(){
 		var args=this;
@@ -33,21 +33,23 @@ Ressource={
 	list:function(){
 		return DB.toList.bind({target:'#results_list',cell:Ressource.cell,table:bd_table,table_class:'table-condensed'})
 	},
-	cell:function(args,val,type){
-		function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-'+ico+'"></span></button>').on('click',oc);}
+	cell:function(args,val,type,row){
+		function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-'+ico+'"></span></button>');}
+		function txt(a,b){return a?('<span class="name">'+b+'</span><span class="value">'+a+'</span>'):null}
 		if(type=='id')
-			return $('<div class="btn-group" style="display:flex" title="'+val+'">')
-				.append(btn('trash'   ,function(){
+			return $('<div class="btn-group" style="display:flex">')
+				.append(btn('trash').on('click',function(){
 					DB('delete',args.table+"/"+val).success((function(){
 						return $(this).closest('tr').fadeOut(500);
 					}).bind(this))
-				}))
-				.append(btn('pencil'  ,Ressource.edit.bind({id:val})));
+				}).attr({title:"supprimer "+val}))
+				.append(btn('pencil').on('click',Ressource.edit.bind({id:val})).attr({"data-toggle":"tooltip"})
+					.tooltip({container:'body',placement:'right',title:$.map(row,txt).join('<br/>'),html:true}));
 		if(type=='href' && val)
 			return $('<a target="blank" title="'+val+'" href="'+val+'">').html('<span class="glyphicon glyphicon-new-window"></span>');
 		if(['fichedev','bdd','photo'].indexOf(type)>=0)
 			return val*1?'&#10004;':'&#10008;';
-		return val;
+		return $('<span>').attr({'title':val}).html(val);
 	}
 };
 //deamons

@@ -35,7 +35,7 @@ a{
 .table-overflow{
 	overflow: auto;
 	width: 100%;
-	max-height: 800px;
+	max-height: 500px;
 	min-height: 150px;
 	/*resize:vertical;*/
 	border-radius: 1em;
@@ -64,4 +64,16 @@ a{
 }
 .query .row:hover .btn{
 	visibility: visible;
+}
+
+.tooltip .name{
+	float:left;
+	opacity:0.5;
+}
+.tooltip .name:after{
+	content:" :";
+}
+.tooltip .value{
+	float:left;
+	font-weight:bold;
 }
