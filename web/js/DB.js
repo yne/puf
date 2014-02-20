@@ -67,7 +67,7 @@ DB.list_th_btn=[
 	['pencil',"Rename",function(){
 		var $th=$(this).closest('th')
 		var name=$th.attr('name');
-		var $label=$th.find('a');
+		var $label=$th.find('a[data-toggle]');
 		var list=JSON.parse(localStorage.list);
 		list.label[name]=prompt("New label for "+name,$label.text());
 		localStorage.list=JSON.stringify(list);
