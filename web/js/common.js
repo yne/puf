@@ -5,19 +5,16 @@
 	$("#menu a:not([href^='#'])").click(function(event){
 		$(this).closest('.open').removeClass('open');
 		window.history.pushState($(this).text(),$(this).text(),this.href);
+		window.onpathchange(location.pathname);
 		event.preventDefault();
 		return false;
 	});
-	
-	var old_pathname="@";
-	setInterval(function(){if(old_pathname===location.pathname)return;
-		$('#page').fadeOut(0);
-		$.get('/html/'+(location.pathname.substr(1).replace(/\//g,'_')||'home')+'.html',function(a){
-			$('#page').html(a).fadeIn();
-		});
-		old_pathname=location.pathname;
-	},200);
 });
+
+(window.onpathchange=function(newpath){
+	var url='/html/'+(newpath.substr(1).replace(/\//g,'_')||'home')+'.html';
+	$('#page').fadeOut(250,function(){$(this).load(url,function(){$(this).slideDown()});});
+})(location.pathname);//trigger on page load
 
 Alert=function(type,msg){ /* info,success,warning,danger */
 	//console.log(type,msg);
@@ -25,7 +22,7 @@ Alert=function(type,msg){ /* info,success,warning,danger */
 		.html(msg).slideDown(400).delay(4000).slideUp(400);
 }
 
-$(document).ajaxError(function(event, jqXHR, ajaxSettings, thrownError){
-	Alert('danger',thrownError);
+$(document).ajaxError(function(e,jq,opt,error){
+	Alert('danger',error);
 	console.warn(this,arguments);
 });
