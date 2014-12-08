@@ -1,0 +1,26 @@
+
+<link rel="stylesheet" href="/css/map.css">
+<div id="map_canvas"></div>
+<div id="infotip" class="tip"></div>
+<pre id="tooltip" class="tip"></pre>
+<div id="infopanel" hidden>
+	<button type="button" class="close" onclick="infopanel.hidden=1">&times;</button>
+	<h2>&nbsp;&nbsp;<span class="text-uppercase" id="nom_com"></span>&nbsp;&nbsp;<small id="nom_dep"></small></h2>
+	<table id="intern" class="restable"></table>
+	<span id="secondaire">
+		<abbr title="Documents dans lequels cette commune est citée">Documentation secondaire</abbr>
+		<table id="extern" class="restable"></table>
+	</span>
+</div>
+<script src="//maps.googleapis.com/maps/api/js?key=AIzaSyCntQpRLDDFDE2xOnOr5pJLzaTdhDGiOoE"></script>
+<script src="/js/Map.js"></script>
+<script src="/js/Map.pref.js"></script>
+<script src="/js/Map.icon.js"></script>
+<script src="/js/Ressource.js"></script>
+<script>
+document.body.onload=(function(){
+	$('#intern').restable(Ressource.table('carte'));
+	$('#extern').restable(Ressource.table('carte_ext'));
+	Map.init();
+});
+</script>

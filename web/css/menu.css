@@ -1,0 +1,100 @@
+/*@media (min-width: 768px){*/
+.navmenu>ul, 
+.navmenu>ul ul,
+.navmenu>ul li{
+	padding: 0px;
+	margin: 0px;
+}
+/*------------------------*/
+/* style global des liens */
+/*------------------------*/
+.navmenu>ul a{
+	display: block;
+	width: 100%;
+	text-decoration: none;
+	color: inherit;
+}
+.navmenu>ul>li>span{
+	text-shadow:0 0 2px #000;
+	color:#FFF;
+}
+.navmenu>ul>li>a>span{
+	padding: 15px 5px;
+	text-shadow:0 0 2px #000;
+	color:#FFF;
+}
+.navmenu>ul>li>ul span{color:#000;}
+/* style global des menus (hover)*/
+.navmenu>ul>li>a:hover{
+	text-shadow:0 0 4px #000;
+}
+.navmenu>ul>li>ul>li a:hover{
+	text-decoration:underline;
+}
+/*------------------------*/
+/* style global des entry */
+/*------------------------*/
+.navmenu>ul li{
+	cursor:default;
+	list-style-type: none;
+}
+.navmenu>ul li{
+	cursor:default;
+	list-style-type: none;
+	padding: 5px 15px;
+}
+/* style des menus de nv 0 */
+.navmenu>ul>li{
+	float: left;
+	white-space: nowrap;
+	padding: 15px;
+}
+.navmenu>ul>li>ul>li>span{
+	color: #888;
+	font-size: smaller;
+}
+.navmenu>ul>li:hover{
+	background-color: #98121B;
+}
+.navmenu>ul li:hover > ul{
+	display: block;
+}
+/*------------------------*/
+/* style global des menus */
+/*------------------------*/
+.navmenu>ul{
+	display: inline;
+	width: 100%;
+}
+.navmenu>ul>li>ul{
+	box-shadow:0 0 2px #000;
+}
+.navmenu>ul>li>ul{
+	display: none;
+	position: absolute;
+	background-color: #FFF;
+	margin-left: -15px;
+	margin-top: 15px;
+	z-index:999;
+	
+}
+.navmenu>ul>li>ul{
+}
+.navmenu>ul>li>ul>li>ul{
+/* indentation a la "windows"*/
+/*
+	margin-top: -1.2em;
+	left: 100%;
+*/
+/* indentation a la "séparator" */
+	display: block;
+	position: relative;
+}
+
+/*}*/
+
+@media (max-width: 768px){
+.navmenu>ul>li{
+	padding: 15px 10px;
+}
+}

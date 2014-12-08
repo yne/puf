@@ -1,0 +1,53 @@
+.restable{
+	margin: auto;
+	background:rgba(255,255,255,0.5);
+}
+
+.restable thead{
+	background:rgba(0,0,0,0.1);
+	border-bottom:1px solid #CCC;
+}
+.restable thead th{
+	text-align:center;
+	padding:0 4px;
+}
+.restable thead th:hover .menu{
+	display: block;
+}
+.restable thead .menu{
+	display: none;
+	position: absolute;
+}
+.restable thead .menu button{
+	padding: 0;
+	width: 32px;
+	height: 24px;
+}
+
+.restable tbody td{
+	overflow:hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+	max-width:100px;
+	text-align: center;
+}
+.restable tbody td button{
+	min-width:2em;
+	padding: 0;
+}
+
+.restable tfoot{
+	background:rgba(0,0,0,0.1);
+	border-top:1px solid #CCC;
+}
+.restable tfoot th ul{
+	width: 100%;
+	display: table;
+	table-layout: fixed;
+	padding: 0;
+	margin: 0;
+}
+.restable tfoot th ul li{
+	display: table-cell;
+	text-align: center;
+}

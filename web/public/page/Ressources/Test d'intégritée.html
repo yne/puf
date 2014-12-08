@@ -1,0 +1,55 @@
+
+<h1>Ressources incompletes</h1>
+<h3>Géolocalisation manquante</h3>
+<div class="table-responsive"><table class="restable"
+	data-struct="/v1/ressource" data-query ="/v1/ressource/coord/"></table></div>
+<h3>Commune manquante (num,nom,code)</h3>
+<div class="table-responsive"><table class="restable"
+	data-struct="/v1/ressource" data-query ="/v1/ressource/"
+	data-param ='{"conj":["|","|","|"],"name":["num_dep","num_commune","nom_commune","code_commune"],"data":["0","0","",0]}'></table></div>
+<h3>Date manquante</h3>
+<div class="table-responsive"><table class="restable"
+	data-struct="/v1/ressource" data-query ="/v1/ressource/date/0"></table></div>
+<h3>Cote manquante</h3>
+<div class="table-responsive"><table class="restable"
+	data-struct="/v1/ressource" data-query ="/v1/ressource/cote/"></table></div>
+<h3>Type de doc imprécis</h3>
+<div class="table-responsive"><table class="restable"
+	data-struct="/v1/ressource" data-query ="/v1/ressource/type/"></table></div>
+<h3>Service/Lieu de conservation imprecis</h3>
+<div class="table-responsive"><table class="restable"
+	data-struct="/v1/ressource" data-query ="/v1/ressource/"
+	data-param ='{"conj":["|","|"],"name":["conservation_service","conservation_lieu"],"data":["",""]}'></table></div>
+
+<h1>Fichiers manquants</h1>
+<h3>Photo</h3>
+<pre id="photo_have">ressource with 'photo=1' but no photo folder :</pre>
+<pre id="photo_miss">ressource with 'photo=0' but has photo folder :</pre>
+<h3>Fiche</h3>
+<pre id="fiche_have">ressource with 'fiche=1' but no folder :</pre>
+<pre id="fiche_miss">ressource with 'fiche=0' but has folder :</pre>
+<h3>Plan</h3>
+<pre id="plan_have">folder but no BDD row :</pre>
+<pre id="plan_miss">BDD row but no folder :</pre>
+<script>
+function check_file(have_url,have_type,must_url,out_have,out_miss){
+	$.getJSON(have_url,function(a){
+		var have=a.map(function(a){return +a[have_type]});
+		$.get(must_url,function(a){
+			var must=(a.match(/\d+\/?<\/a>/g)||[]).map(function(a){return +a.match(/\d+/)[0]})
+			have.forEach(function(m){
+				if(must.indexOf(m)<0)out_have.innerHTML+="\n"+m;
+			})
+			must.forEach(function(m){
+				if(have.indexOf(m)<0)out_miss.innerHTML+="\n"+m;
+			})
+		})
+	})
+}
+
+document.body.onload=(function(){
+	check_file('/v1/ressource/has_photo/1','id','/public/photo/',photo_have,photo_miss);
+	check_file('/v1/ressource/has_doc/1'  ,'id','/public/fiche/',fiche_have,fiche_miss);
+	check_file('/v1/plan/ressource','ressource','/public/photo/', plan_have, plan_miss);
+})
+</script>

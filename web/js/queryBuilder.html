@@ -1,0 +1,21 @@
+<html>
+<div id="qb" class="querybuilder" data-url="/v1/ressource" data-usehash></div>
+
+<script>
+queryBuilder=function(elem,param){//constructor
+	var params=param;
+	for(var a in elem.dataset)
+		params[a]=elem.dataset[a];
+}
+queryBuilder.get=function(){}
+queryBuilder.set=function(){}
+queryBuilder.add=function(){}
+
+/*onload*/{
+[].slice.call(document.querySelectorAll('.queryBuilder')).forEach(function(elem){
+	new queryBuilder(elem,{});
+})
+}
+</script>
+
+</html>

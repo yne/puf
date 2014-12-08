@@ -1,0 +1,17 @@
+<div class="container">
+	<h3>Recherche par services de conservation</h3>
+	<small>Filtrage par département : <select id="dep" onchange="tab_search()"><option value="">Aucun</select></small>
+	<div class="btn-group btn-group-justified">
+		<a type="button" onclick="tab_search(this,event)" class="btn btn-default" data-req='{"name":["conservation_service"],"oper":["~"],"data":["Arch. Dép" ]}'><button title="Visualiser" class="btn btn-xs btn-default" onclick="tab_map(this,event);">&#9873;</button> Archives Départementales</a>
+		<a type="button" onclick="tab_search(this,event)" class="btn btn-default" data-req='{"name":["conservation_service"],"oper":["~"],"data":["Arch. Mun."]}'><button title="Visualiser" class="btn btn-xs btn-default" onclick="tab_map(this,event);">&#9873;</button> Archives Municipales</a>
+		<a type="button" onclick="tab_search(this,event)" class="btn btn-default" data-req='{"name":["conservation_service"],"oper":["~"],"data":["Arch. priv"]}'><button title="Visualiser" class="btn btn-xs btn-default" onclick="tab_map(this,event);">&#9873;</button> Fonds Privés </a>
+		<a type="button" onclick="tab_search(this,event)" class="btn btn-default" data-req='{"name":["conservation_service"],"oper":["~"],"data":["Bib. Mun." ]}'><button title="Visualiser" class="btn btn-xs btn-default" onclick="tab_map(this,event);">&#9873;</button> Bibliothèque municipale </a>
+		
+	</div>
+</div>
+
+<div class="table-responsive"><table id="results" class="restable"></table></div>
+
+<script>logo_modelespace.hidden=1</script>
+<script src="/js/Ressource.js"></script>
+<script src="/js/tab.js"></script>

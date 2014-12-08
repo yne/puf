@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="/js/diapo.js"></script>
+	<link rel="stylesheet" href="/css/diapo.css">
+</head>
+<body onload="visualizer.reset();if(location.hash)visualizer.load(location.hash.slice(1));">
+
+<div class="visualizer">
+	<div class="imagecontainer" onmousedown="return false;" onclick="if(event.target==this)visualizer.exit()">
+		<img id="img">
+		<div style="position:absolute;bottom:20px;right:125px;font-size:12px;">
+			<div data-col="ressource.commentaires"></div>
+			<!--<div data-col="ressource.description"></div>-->
+		</div>
+		<a onclick="visualizer.shift(-1)" class="arrow" style="top: 0px;" title="Précédent">&#9650;</a>
+		<a onclick="visualizer.shift(+1)" class="arrow" style="bottom: 0px;" title="Suivant">&#9660;</a>
+	</div>
+	
+	<aside id="aside">
+		<h3><span data-col="ressource.conservation_service"></span> , <span data-col="ressource.cote"></span></h3>
+		
+		<info><name>Commune :</name><value data-col="ressource.nom_commune"></value> (<value data-col="ressource.num_dep"></value>)</info>
+		<info><name>Code ressource :</name><value data-col="ressource.id"></value></info>
+		<info><name>Nature :</name><value data-col="ressource.type"></value></info>
+		<info><name>Description :</name><value data-col="photo.descriptif"></value></info>
+		<!-- PLAN -->
+		<span class="plan">
+		<info><name>Type :</name><value data-col="plan.type"></value></info>
+		<info><name>Code :</name><value data-col="plan.id"></value></info>
+		<info><name>Legende :</name><value data-col="plan.legend"></value></info>
+		<info><name>Commentaire :</name><value data-col="plan.comment"></value></info>
+		</span>
+		<ul id="list"></ul>
+		<div style="position:absolute;bottom:5px;">
+			<info><name>Auteur :</name><value data-col="photo.auteur"></value></info>
+			<info><name>Date :</name><value data-col="photo.date"></value></info>
+			<info><name>Code photo :</name><value data-col="photo.id"></value></info>
+			<input type="hidden" id="rot" data-col="photo.nord"/>
+		</div>
+	</aside>
+	
+	<table class="controls">
+		<tr>
+			<td onmousedown="return visualizer.set('scale' ,'*',2.0)">+</td>
+			<td onmousedown="return visualizer.set('top'   ,'+', 10);" >&#8593;</td>
+			<td onmousedown="return visualizer.set('rotate','=', +rot.value || prompt('Saisir une valeur (0~360)'));" id="rot_btn">&#10146;</td>
+		</tr>
+		<tr>
+			<td onmousedown="return visualizer.set('left'  ,'+',10);">&#8592;</td>
+			<td onmousedown="return visualizer.reset();"        >&times;</td>
+			<td onmousedown="return visualizer.set('left'  ,'+',-10);">&#8594;</td>
+		</tr>
+		<tr>
+			<td onmousedown="return visualizer.set('scale' ,'*',0.5)">-</td>
+			<td onmousedown="return visualizer.set('top'   ,'+',-10);">&#8595;</td>
+			<td onmousedown="return visualizer.set('rotate','+',-90);">&#8634;</td>
+		</tr>
+	</table>
+</div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<div class="container">
+	<h3>Recherche par type de documents</h3>
+	<small>Filtrage par département : <select id="dep" onchange="tab_search()"><option value="">Aucun</select></small>
+	<div class="btn-group btn-group-justified">
+		<a type="button" onclick="tab_search(this,event)" class="btn btn-default" data-req='{"name":["type"],"data":["compoix"  ]}' title="Documents fiscaux publics"  ><button title="Visualiser" class="btn btn-xs btn-default" onclick="tab_map(this,event);">&#9873;</button> Compoix  </a>
+		<a type="button" onclick="tab_search(this,event)" class="btn btn-default" data-req='{"name":["type"],"data":["mutations"]}' title="Documents fiscaux annexes"  ><button title="Visualiser" class="btn btn-xs btn-default" onclick="tab_map(this,event);">&#9873;</button> Mutations</a>
+		<a type="button" onclick="tab_search(this,event)" class="btn btn-default" data-req='{"name":["type"],"data":["terrier"  ]}' title="Documents fiscaux privés"   ><button title="Visualiser" class="btn btn-xs btn-default" onclick="tab_map(this,event);">&#9873;</button> Terrier  </a>
+		<a type="button" onclick="tab_search(this,event)" class="btn btn-default" data-req='{"name":["type"],"data":["plan"     ]}' title="Documents planimetriques"   ><button title="Visualiser" class="btn btn-xs btn-default" onclick="tab_map(this,event);">&#9873;</button> Plan     </a>
+		<a type="button" onclick="tab_search(this,event)" class="btn btn-default" data-req='{"name":["type","type","type","type"],"oper":["!","!","!","!"],"data":["compoix","plan","terrier","mutations"]}'><button title="Visualiser" class="btn btn-xs btn-default" onclick="tab_map(this,event);">&#9873;</button> Autre    </a>
+	</div>
+</div>
+
+<div class="table-responsive"><table id="results" class="restable"></table></div>
+
+<script>logo_modelespace.hidden=1</script>
+<script src="/js/Ressource.js"></script>
+<script src="/js/tab.js"></script>

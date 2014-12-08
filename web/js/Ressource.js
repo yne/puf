@@ -1,59 +1,48 @@
 Ressource={
-edit:function(){
-	var args=this;
-	$('#Modal').modal('show');
-	$('#ModalDrop')[0].onload=Ressource.file;
-	DB('option',bd_table).success(
-		DB.toForm.bind({table:bd_table,target:'#Modal .modal-body',id:args.id,
-		submit:function(event){
-			$form=$(event.target);
-			var id=$form.find('[name=nocommune]').val()*10000+$form.find('[name=date]').val()*1;
-			$form.find('[name=id]').val(id);
-		},
-		success:function(id){
-			Alert('success',(args.id?'Updated':'Created')+(id?' : <a href="#&id='+id+'">'+id+'</a>':''));
-			if(args.id)DB('get',bd_table+'/'+args.id).success(function(rows){//modified : ask for the new version
-				DB.toRow($('tr[name='+rows[0].id+']'),rows[0],{cell:Ressource.cell,list:JSON.parse(localStorage.list)})});
-			$('#Modal').modal('hide');
-			$('#ModalDrop')[0].onload=undefined;
-	}}));
+getColor:function(i){
+	var colors=[
+	"037","059","06b","07e","08f","29f","5af","7bf","acf","cdf",
+	"076","098","0ba","0ed","0fe","2fe","5fe","7fe","afe","cff",
+	"270","290","2b0","3e0","3f0","5f2","7f5","9f7","bfa","cfc",
+	"570","790","9b0","be0","cf0","cf2","df5","df7","efa","efc",
+	"740","960","b70","e90","fa0","fb2","fc5","fc7","fda","fec",
+	"710","910","b10","e10","f20","f42","f65","f87","faa","fcc",
+	"703","904","b05","e06","f07","f29","f5a","f7b","fac","fcd",
+	"607","909","b0c","d0e","f0f","f2f","f5f","f7f","faf","fcf",
+	"307","409","40b","50e","60f","82f","95f","a7f","caf","dcf",
+	"333","555","666","777","888","999","aaa","bbc","ddd","eee"];
+	return "#"+colors[i%colors.length];
 },
-list:function(){
-	return DB.toList.bind({target:'#results_list',cell:Ressource.cell,table:bd_table,table_class:'table-condensed'})
-},
-cell:function(args,val,type,row){
-	function btn(ico,oc){return $('<button type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-'+ico+'"></span></button>');}
-	function txt(a,b){return a?('<span class="name">'+b+'</span><span class="value">'+a+'</span>'):null}
-	if(type=='id')
-		return $('<div class="btn-group" style="display:flex">')
-			.append(btn('trash').on('click',function(){
-				DB('delete',args.table+"/"+val).success((function(){
-					return $(this).closest('tr').fadeOut(500);
-				}).bind(this))
-			}).attr({title:"supprimer "+val}))
-			.append(btn('pencil').on('click',Ressource.edit.bind({id:val})).attr({"data-toggle":"tooltip"})
-				.tooltip({container:'body',placement:'right',title:$.map(row,txt).join('<br/>'),html:true}));
-	if(type=='href' && val)
-		return $('<a target="blank" title="'+val+'" href="'+val+'">').html('<span class="glyphicon glyphicon-new-window"></span>');
-	if(['fichedev','bdd','photo'].indexOf(type)>=0)
-		return val*1?'&#10004;':'&#10008;';
-	return $('<span>').attr({'title':val}).html(val);
-},
-file:function(modalDrop){
-	function log(txt){$('#log').append(txt).append('<br/>');}
-	function arr2obj(cols,entrie){for(var i in entrie)this[cols[i]]=entrie[i];}
-	var entries=DB.parseCSV(this.result);
-	if(!entries.length)return Alert('info','fichier vide');
-	var cols=$(modalDrop).find('form').hide().find('[name]').map(function(a){return this.name});
-	if($(modalDrop).find('.progress').size()==0)$(modalDrop).find('.modal-body').append('<div class="progress progress-striped active"><div class="progress-bar"></div></div><pre id="log"></pre>');
-	log('Import : '+ entries.length +' entr�es');
-	$('.progress').addClass('progress-striped active');
-	entries.forEach(function(entry,i){
-		$('.progress-bar').css({width:(i/entries.length)*100+'%'});
-		DB('put',bd_table,{async:false/*inb4 lost my job etc..*/,data:JSON.stringify(new arr2obj(cols,entry))}).success(console.log);
-		$('.progress-bar').css({width:((i+1)/entries.length)*100+'%'});
-	});
-	$('.progress').removeClass('progress-striped active');
-	log('Import ok');
-}
+btn_style:'font-size:1.3em;text-decoration:none;border:1px solid #CCC;border-radius:3px;',
+table:function(type){return {
+	struct:"/v1/ressource",
+//	query :"/v1/ressource/",
+//	param :{conj:["&"],name:["documentation_associée"],oper:["!"],data:['']},
+	only:{
+		carte    :['id','type','date','cote','has_doc','has_bdd','has_geo','has_photo','url'],
+		carte_ext:['id','type','date','cote','has_doc','has_bdd','has_geo','has_photo','url','communes_secondaires'],
+		}[type],
+	table :{
+		'id'       :{title:"&nbsp;",format:function(val,row,t,c){return $("<button/>",{title:$.map(row,function(a,b){return (a&&a!="0"&&t[b])?(t[b].desc || t[b].name || b)+" :\n\t"+a+'\n':''}).join('')}).html('&#9432;').click(function(){alert(this.title)})}},
+		'url'      :{format:function(val,row){if( val)return $('<a/>',{style:Ressource.btn_style,title:"Afficher les vues depuis un autre site web",target:'_blank',href:val}).html('&#8689;')}},
+		'has_doc'  :{format:function(val,row){if(+val)return $('<a/>',{style:Ressource.btn_style,title:"Afficher les documents associés"           ,target:'_blank',href:'/Fiche/'+row['id']+'?full'})                                                                .click(function(){window.open(this.href,'fiche' ,'location=0,top=0,left=0');return false;}).html('&#9636;')}},
+		'has_bdd'  :{format:function(val,row){if(+val)return $('<a/>',{style:Ressource.btn_style,title:"Chercher dans la base de donnée associée"  ,target:'_blank',href:'/Page/Sources/Recherche%20avanc%C3%A9e.html?full#'+row['id']})                              .click(function(){window.open(this.href,'source','location=0,top=0,left=0');return false;}).html('&#8981;')}},
+		'has_geo'  :{format:function(val,row){if(+val)return $('<a/>',{style:Ressource.btn_style,title:"Géolocaliser les vues"                     ,target:'_blank',href:'/Page/Accès cartographique.html?full#'+row['id'],css:{color:Ressource.getColor(row['id'])}}).click(function(){window.open(this.href,'map'   ,'location=0,top=0,left=0');return false;}).html('&#9873;')}},
+		'has_photo':{format:function(val,row){if(+val)return $('<a/>',{style:Ressource.btn_style,title:"Visualiser les vues"                       ,target:'_blank',href:'/html/diapo.html?full#'+row['id']})                                                         .click(function(){window.open(this.href,'diapo' ,'location=0,top=0,left=0');return false;}).html('&#9654;')}},
+	},
+	tfoot:!type,
+	pagination:type?99:20,
+}}
 };
+/*
+Ressource.showFiles=function(key){
+	$('#ajaxModal').modal('show');
+	$('#ajaxModal').find('.modal-title').html('Documents associés au document n° '+key+'');
+	$.getJSON('/file/get/fiche/'+key,function(a){
+		$('#ajaxModal').find('.modal-body' ).html('<dl class="dl-horizontal"><dt><u>Fichier</u></dt><dd><u>Informations</u></dd>'+a.map(function(f){
+			var pow=Math.floor(((+f.size).toString(2).length-1)/10);
+			return '<dt><a href="/'+f.path+'">'+f.name+'</a></dt><dd>Taille : '+(f.size>>(10*pow))+' '+['octets','Ko','Mo','Go'][pow]+' , Date : '+(new Date(f.date*1000)).toLocaleString()+'</dd>'}
+		)+'</dl>');
+	});
+}
+*/

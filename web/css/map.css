@@ -1,0 +1,56 @@
+/*hide the title and the footer*/
+#titlebar,.footer{display:none;}
+/* make the navbar translucid */
+.header{
+	background-color:rgba(152,132,82,0.85);
+	position: fixed;
+	width: 100%;
+}
+/* use all the screen size */
+html,body,body>.content,#map_canvas{ height: 100% }
+
+#infopanel{
+	position:absolute;
+	right:4px;bottom:4px;
+	top:55px;
+	padding:5px;
+	width:25%;
+	min-width: 410px;
+	background:rgba(255,255,255,0.85);
+	border:1px solid #000;
+	overflow: auto;
+}
+#infopanel #secondaire>abbr{
+	font-size: large;
+	text-align: center;
+	display: block;
+	border-top: solid 2px;
+	border-bottom: 2px solid;
+	padding: 5px;
+	margin: 5px;
+}
+.restable{width: 100%;}
+.tip{
+	position:absolute;
+	background: #ffffff;
+	background: linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);
+	padding: 3px;
+	border-radius: 4px;
+	border: 1px solid #000;
+	box-shadow: 1px 1px 3px #000;
+	display:none;
+	max-width:400px;
+	text-overflow:ellipsis;
+	overflow:hidden;
+}
+#tooltip{
+	z-index: 9999;
+}
+#infotip{
+	left:0;
+	right:0;
+	top:64px;
+	text-align: center;
+	margin: 0 auto;
+	width: 200px;
+}
