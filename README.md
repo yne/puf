@@ -1,8 +1,50 @@
+#INSTALL
+
+##Get the source
+
+The 2 install ways are :
+
+1. Using a tar.bz/zip snapshot:
+
+	- `curl -LO https://github.com/yne/puf/archive/master.tar.gz` (or `wget https://...`)
+	- `tar -xf master.tar.gz` (or `unzip master.zip` if you used the .zip url) 
+
+2. Using Git:
+
+	- `cd` to your server `www` directory
+	- `git clone https://github.com/yne/puf`
+
+Use the Git method if you plan on using a revision control software.
+
+Finally, you may want to rename the extracted folder to something nicer
+
+##Update apache .conf
+
+- update the `DocumentRoot` of your `/etc/httpd/conf/httpd.conf` to the puf `www` directory
+
+```
+DocumentRoot /path/to/puf/www
+```
+
+- Check if apache read .htaccess (if not, only the index page will work)
+
+```
+	<Directory />
+		Allowoverride ALL
+	</Directory>
+```
+
+## The End
+
+You successfully installed puf !
+
+
+# Under the hood
 This framework is divided into 2 major folders
  - `/src/` 
  - `/web/` wish is accessible from the web
 
-#Request handling by example :
+## Request handling by example :
 Let's see what actions the following request `GET site.com/hello/world` will try  (stop as soon as on of them succeed) :
 
 1. If `/web/hello/world` file exist : send it
@@ -14,11 +56,11 @@ Let's see what actions the following request `GET site.com/hello/world` will try
 
 The 2 to 6 tries are described in the /web/index.php file
 
-#/src
+## /src
 This folder contain every server-side controlers.
 Each controler will be call according to they name and the requested URL.
 PUF comes with some controlers examples :
-## v1.php (handle every `/v1/*` url)
+### v1.php (handle every `/v1/*` url)
 Deliver a RESTFull view of the database see /src/v1.md for API
 ```
 /v1/users => Display information about table column names/size/comment that could be use to generate a dynamic formular
@@ -27,13 +69,13 @@ Deliver a RESTFull view of the database see /src/v1.md for API
 /v1/users/name/john => SELECT * FROM users where name = john
 ```
 
-## Page.php (equivalent to `default.php` in the request handling example)
+### Page.php (equivalent to `default.php` in the request handling example)
 Render every requested web pages by sourrounding them with a header/menu/footer
 For example requesting `/Page/Just/An/Example.html` will return `/web/public/page/Just/An/Example.html` with a header/menu/footer
-### Provided utilities 
+#### Provided utilities 
 - The main menu is automaticaly generated using `/web/public/page/` content and sub-folders.
 - The page content can be a .md (markdown) file. The content will be converted to HTML on the client side 
 
-#/web
+## /web
 All the /web folder content is unrestrictivly accessible to any request.
 So it's a very bad idea to store any sensitive information (SQL credentials) in this folder. Use the /src/ folder insteate (wich can't be directy accessed)
