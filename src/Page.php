@@ -1,10 +1,10 @@
 <?php
 function dir2ul($path,$title){
-	if(!is_dir($path))return "<a href=\"/Page/".utf8_encode($path)."\"><span>".utf8_encode(pathinfo($title, PATHINFO_FILENAME))."</span></a>";
+	if(!is_dir($path))return '<a href="'.str_replace('/./','/','/Page/'.utf8_encode($path)).'"><span>'.utf8_encode(preg_replace('/^\d+\./','',pathinfo($title, PATHINFO_FILENAME)))."</span></a>";
 	$html="";
 	foreach(preg_grep('/^([^.])/', scandir($path)) as $file)
 		$html.='<li>'.dir2ul($path.'/'.$file,$file).'</li>';
-	return '<span>'.utf8_encode($title).'</span><ul>'.$html.'</ul>';
+	return '<span>'.utf8_encode(preg_replace('/^\d+\./','',$title)).'</span><ul>'.$html.'</ul>';
 }
 function prety_ls($path,$type){
 	$html='<thead><tr><th>Titre</th><th>Size (KB)</th>
@@ -76,14 +76,8 @@ EOT;
 {$footer}
 		<script src="//cdnjs.cloudflare.com/ajax/libs/marked/0.3.2/marked.min.js"></script>
 		<script>//search for a .md content tag and parse it
-			/*
-			var bootrend = new marked.Renderer();
-			bootrend.table = function(header, body){
-				return '<table class="table"><thead>'+header+'</thead><tbody>'+body+'</tbody></table>';
-			};
-			*/
 			var md=document.querySelector('[data-type="md"]');
-			if(md)md.innerHTML='<div class="container justifier"><div class="row">'+marked(md.innerHTML/*,{renderer:bootrend}*/)+'</div></div>';
+			if(md)md.innerHTML='<div class="container justifier">'+marked(md.innerHTML)+'</div>';
 		</script>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<script src="/js/queryBuilder.js"></script>
