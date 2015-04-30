@@ -14,7 +14,7 @@
 	RESTable.DEFAULTS = {
 		pagination: 20,
 		tfoot:true,
-		table:null,
+		table:{},
 		struct:null,
 	}
 	
@@ -155,7 +155,7 @@
 	// ==================
 
 	$(window).on('load', function () {
-		$('table[data-query]').each(function () {
+		$('table[data-query],.restable').each(function () {
 			$(this).restable($(this).data())
 		});
 	});
