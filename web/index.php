@@ -10,7 +10,7 @@ try{
 	if(file_exists("../src/$args[0].php"))
 		require_once("../src/$args[0].php");
 	else
-		require_once("../src/Page.php");
+		require_once("../src/page.php");
 
 	if(@function_exists("get_".$args[1]))
 		call_user_func_array("get_".$args[1],$args);
